@@ -3,7 +3,6 @@ import cors from "cors";        // Importing CORS middleware to handle cross-ori
 import cookieParser from "cookie-parser"; // Importing middleware to parse cookies
 
 const app = express(); // Creating an Express application instance
-
 // Middleware to handle Cross-Origin Resource Sharing (CORS)
 // It allows requests from different origins specified in the environment variable `CORS_ORIGIN`
 app.use(cors({
@@ -27,5 +26,10 @@ app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 // Middleware to parse cookies from incoming requests
 // This makes cookies accessible through `req.cookies`
 app.use(cookieParser());
+
+//Routes
+import userRouter from "./routes/user.routes.js";
+// route declaration....
+app.use("/api/v2/users",userRouter)
 
 export default app; // Exporting the app instance for use in other files (e.g., server.js)
