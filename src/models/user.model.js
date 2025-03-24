@@ -3,7 +3,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken"
 
 const userSchema = new mongoose.Schema({
-   userName: {
+   username: {
     type: String,
     required: true,
     lowecase: true,
@@ -17,7 +17,7 @@ const userSchema = new mongoose.Schema({
     lowercase: true,
     unique: true,
     trim: true,
-    match: []
+    match: [/\S+@\S+\.\S+/, "Invalid email format"],
    },
    fullName: {
     type: String,
@@ -48,17 +48,19 @@ const userSchema = new mongoose.Schema({
 },{timestamps: true});
 //Hash the user password befor storing them...
 //yo aauta middle ware ho jasla password lai store garxa database ma....
-userSchema.pre("save", async function(next) {
-    if(!this.isModified("password")) return next();
-    this.password = await bcrypt.hash(this.password);
-    
-});
+// Hash password before saving to database
+userSchema.pre("save", async function (next) {
+    if (!this.isModified("password")) return next();
+    const salt = await bcrypt.genSalt(10); // Generate salt
+    this.password = await bcrypt.hash(this.password, salt);
+    next();
+  });
 //check if the password is correct during login ...
 userSchema.methods.isPasswordCorrect = async function(password){
     return await bcrypt.compare(password,this.password);
 };
 
-UserSchema.methods.generateAccessToken = function() {
+userSchema.methods.generateAccessToken = function() {
     return jwt.sign(
         {
             _id: this._id,
@@ -70,7 +72,7 @@ UserSchema.methods.generateAccessToken = function() {
         { expiresIn: process.env.ACCESS_TOKEN_EXPIRY }
     );
 };
-UserSchema.methods.generateRefreshToken = function() {
+userSchema.methods.generateRefreshToken = function() {
     return jwt.sign(
         { _id: this._id },
         process.env.REFRESH_TOKEN_SECRET,
@@ -78,3 +80,5 @@ UserSchema.methods.generateRefreshToken = function() {
     );
 }
 
+ const User = mongoose.model("User",userSchema);
+ export default User;

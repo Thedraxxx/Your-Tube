@@ -1,5 +1,5 @@
 import { asyncHandler } from "../utils/asyncHandeler.js";
-import userSchema from "../models/user.model.js";
+import User from "../models/user.model.js";
 import cloudinary from "../utils/cloudninary.js";
 const userRegister = asyncHandler(async(req,res)=>{
    // get user creditals form the frontedn ....
@@ -17,7 +17,7 @@ const userRegister = asyncHandler(async(req,res)=>{
    if(!username || !email || !password){
       return res.status(400).json({message: "All feilds are required."});
    };
-   const existingEmail = await userSchema.findOne({email});
+   const existingEmail = await User.findOne({email});
 
    if(existingEmail){
       return res.status(400).json({message: "Email is alredy exist"})
@@ -32,8 +32,8 @@ const userRegister = asyncHandler(async(req,res)=>{
             return res.status(500).json({ message: "Failed to upload avatar image." });
          }
       }
-   const newUser = await userSchema.create({
-      userName,
+   const newUser = await User.create({
+      username,
       email,
       fullName,
       password,
@@ -44,7 +44,7 @@ const userRegister = asyncHandler(async(req,res)=>{
       message: "User Register sucessfully",
       user: {
          id: newUser._id,
-         userName: newUser.userName,
+         username: newUser.username,
          email: newUser.email,
          avatar: newUser.avatar,
       }
