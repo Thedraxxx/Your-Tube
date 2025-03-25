@@ -11,48 +11,33 @@
 // This function is called in the controller (userRegister.js) when the user uploads an avatar.
 
 
-// Import Cloudinary V2 SDK
-import { v2 as cloudinary } from "cloudinary";
-// Import file system module to handle local file operations
-import fs from "fs";
+import {v2 as cloudinary} from "cloudinary"
+import fs from "fs"
 
-// Configure Cloudinary with credentials from environment variables
+
 cloudinary.config({ 
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,  // Your Cloudinary cloud name
-  api_key: process.env.CLOUDINARY_API_KEY,        // Your Cloudinary API key
-  api_secret: process.env.CLOUDINARY_API_SECRET   // Your Cloudinary API secret
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME, 
+  api_key: process.env.CLOUDINARY_API_KEY, 
+  api_secret: process.env.CLOUDINARY_API_SECRET 
 });
 
-/**
- * Function to upload a file to Cloudinary.
- * @param {string} localFilePath - The path of the file stored locally before upload.
- * @returns {object | null} - Returns Cloudinary response object if successful, otherwise null.
- */
 const uploadOnCloudinary = async (localFilePath) => {
     try {
-        // If the file path is not provided, return null
-        if (!localFilePath) return null;
-
-        // Upload the file to Cloudinary
+        if (!localFilePath) return null
+        //upload the file on cloudinary
         const response = await cloudinary.uploader.upload(localFilePath, {
-            resource_type: "auto" // Automatically detects the file type (image, video, etc.)
-        });
-
-        // File uploaded successfully, now deleting it from local storage
-        fs.unlinkSync(localFilePath);
-
-        // Return Cloudinary's response, which contains the uploaded file URL and other details
+            resource_type: "auto"
+        })
+        // file has been uploaded successfull
+        //console.log("file is uploaded on cloudinary ", response.url);
+        fs.unlinkSync(localFilePath)
         return response;
 
     } catch (error) {
-        // If an error occurs, delete the local file (cleanup)
-        fs.unlinkSync(localFilePath);
-
-        // Return null as the upload failed
+        fs.unlinkSync(localFilePath) // remove the locally saved temporary file as the upload operation got failed
         return null;
     }
-};
-
+}
 // Export the configured Cloudinary instance
 export default uploadOnCloudinary;
 

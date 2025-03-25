@@ -1,5 +1,5 @@
 // Import the Multer library, which is used for handling file uploads in Node.js applications
-import multer from "multer";
+
 
 // Configure storage settings for uploaded files using diskStorage (storing files locally)    
 
@@ -9,25 +9,22 @@ import multer from "multer";
 // Faster processing as files are saved on the server before further handling.
 // Useful for debugging before uploading files to external storage.
 
-const storage = multer.diskStorage({    
-    // Define the destination folder where uploaded files will be stored
+import multer from "multer";
+
+const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-      // "./public/temp" means that all uploaded files will be temporarily stored in the "public/temp" folder
-      cb(null, "./public/temp"); // cb is a callback function that tells Multer where to save the file
+      cb(null, "./public/temp")
     },
-
-    // Define how the uploaded file should be named when saved
     filename: function (req, file, cb) {
-      // The file will be saved with its original name
-      // Example: If a user uploads "profile.jpg", it will be saved as "profile.jpg"
-      cb(null, file.originalname);
+      
+      cb(null, file.originalname)
     }
-});
-
-// Create an instance of Multer with the configured storage settings
-const upload = multer({ 
-    storage,  // Use the storage settings defined above
-});
+  })
+  
+export const upload = multer({ 
+    storage, 
+    limits: {fileSize: 5 * 1024 * 1024}
+})
 
 // Export the upload instance so it can be used in other files where file uploads are needed
 export default upload;
