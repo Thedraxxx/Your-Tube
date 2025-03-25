@@ -3,7 +3,7 @@ import connectDatabase from "./db/index.js";
 import app from "./app.js";
 
 dotenv.config({  //load the .env file to access the variable
-    path: './env'
+    path: './.env'
 })
 connectDatabase()   //so it return promesies and the it make sure to run the server in given port..
 .then(()=>{

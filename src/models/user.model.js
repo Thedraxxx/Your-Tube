@@ -19,7 +19,7 @@ const userSchema = new mongoose.Schema({
     trim: true,
     match: [/\S+@\S+\.\S+/, "Invalid email format"],
    },
-   fullName: {
+   fullname: {
     type: String,
     required: true,
     trim: true,
@@ -41,7 +41,7 @@ const userSchema = new mongoose.Schema({
     type: mongoose.Schema.ObjectId,
     ref: "video"
    },
-   refreshTolen: {
+   refreshToken: {
     type: String,
    }
 
@@ -66,7 +66,7 @@ userSchema.methods.generateAccessToken = function() {
             _id: this._id,
             email: this.email,
             username: this.userName,
-            fullName: this.fullName
+            fullname: this.fullname
         },
         process.env.ACCESS_TOKEN_SECRET,
         { expiresIn: process.env.ACCESS_TOKEN_EXPIRY }
