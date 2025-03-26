@@ -1,35 +1,84 @@
-import express from "express";  // Importing Express framework
-import cors from "cors";        // Importing CORS middleware to handle cross-origin requests
-import cookieParser from "cookie-parser"; // Importing middleware to parse cookies
+import express from "express"; 
+import cors from "cors"; 
+import cookieParser from "cookie-parser"; 
 
-const app = express(); // Creating an Express application instance
-// Middleware to handle Cross-Origin Resource Sharing (CORS)
-// It allows requests from different origins specified in the environment variable `CORS_ORIGIN`
-app.use(cors({
-    origin: process.env.CORS_ORIGIN // Only allows requests from this origin
-}));
+const app = express(); 
 
-// Middleware to parse JSON data from incoming requests
-// `limit: "20kb"` restricts JSON payload size to 20 kilobytes to prevent large payload attacks
-app.use(express.json({
-    limit: "20kb"
-}));
+app.use(
+  cors({
+    origin: process.env.CORS_ORIGIN, 
+  })
+);
 
-// Middleware to serve static files (like images, CSS, JS) from the "public" directory
-app.use(express.static("public"));
+app.use(
+  express.json({
+    limit: "20kb",
+  })
+);
 
-// Middleware to parse URL-encoded data (e.g., form submissions)
-// `extended: true` allows nested objects in query strings
-// `limit: "16kb"` restricts the payload size to 16 kilobytes
+app.use(express.static("public")); 
+
 app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 
-// Middleware to parse cookies from incoming requests
-// This makes cookies accessible through `req.cookies`
 app.use(cookieParser());
 
-//Routes
-import userRouter from "./routes/user.routes.js";
-// route declaration....
-app.use("/api/v2/users",userRouter)
+import userRouter from "./routes/user.routes.js"; 
 
-export default app; // Exporting the app instance for use in other files (e.g., server.js)
+app.use("/api/v2/users", userRouter);
+
+export default app; 
+
+
+// 🛠️ Importing necessary modules:
+// `express`: A web framework to create a server and handle routing.
+// `cors`: Middleware to handle Cross-Origin Resource Sharing (CORS) and allow or restrict access to your API from other origins.
+// `cookie-parser`: Middleware to parse cookies from incoming requests.
+
+
+// 🚀 Initialize the Express application:
+// `app`: This is the instance of your Express app where you define routes, middleware, and other configurations.
+
+
+// 🔐 Set up CORS (Cross-Origin Resource Sharing) Middleware:
+// This middleware is responsible for handling requests from different origins (domains). 
+// Only the origin defined in your environment variable `CORS_ORIGIN` will be allowed to interact with your API. 
+// This is important for security to avoid unauthorized access to your resources.
+
+
+// 🔄 Setup Middleware for JSON Parsing:
+// `express.json()` is used to parse JSON payloads from incoming requests. 
+// The `limit: "20kb"` option restricts the size of the incoming JSON body to 20 kilobytes to prevent large payload attacks.
+
+
+  
+// 🖼️ Serve Static Files:
+// The `express.static("public")` middleware serves static assets like images, styles, and JavaScript files from the `public` folder. 
+// This is essential if you need to serve frontend assets directly from the server.
+
+
+  
+// 📝 Handle URL-Encoded Data:
+// This middleware parses URL-encoded data, typically sent by form submissions. 
+// `extended: true` allows for parsing of complex objects (nested data) in the query string, while `limit: "16kb"` limits the data size.
+
+
+  
+// 🍪 Cookie Parsing Middleware:
+// `cookieParser()` is used to parse cookies from the incoming requests and make them available via `req.cookies`.
+// This is useful for tracking sessions or handling authentication via cookies.
+
+
+  
+// 🧑‍💻 Import User Routes:
+// The `userRouter` is imported from `user.routes.js`, where all routes related to user actions (e.g., registration, login, etc.) are defined.
+
+
+  
+// 🛣️ Define Route for User API:
+// The `app.use("/api/v2/users", userRouter)` line connects the route path `/api/v2/users` to the user routes.
+// This means that any request that starts with `/api/v2/users` will be handled by the `userRouter`.
+
+
+  
+// 📤 Export the Express App:
+// The `app` instance is exported so it can be used in another file (e.g., `server.js`) to start the server and handle incoming requests.
