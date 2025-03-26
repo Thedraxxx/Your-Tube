@@ -6,10 +6,10 @@ const userSchema = new mongoose.Schema({
    username: {
     type: String,
     required: true,
-    lowecase: true,
+    lowercase: true,
     unique: true,
     trim: true,
-    index: true, // searchable optimize....
+   
    },
    email:{
     type: String,
@@ -38,8 +38,8 @@ const userSchema = new mongoose.Schema({
     type: String,
    },
    watchHistory: {
-    type: mongoose.Schema.ObjectId,
-    ref: "video"
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Video"
    },
    refreshToken: {
     type: String,
@@ -65,7 +65,7 @@ userSchema.methods.generateAccessToken = function() {
         {
             _id: this._id,
             email: this.email,
-            username: this.userName,
+            username: this.username,
             fullname: this.fullname
         },
         process.env.ACCESS_TOKEN_SECRET,

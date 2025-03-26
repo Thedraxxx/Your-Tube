@@ -5,6 +5,8 @@ const asyncHandler = (fn)=>{ return (req,res,next) => {
     //This is imp because if fn is an async function it misght throw an error....
     //this function is wrapped in promise.rosolve() to make sure that even if fn fails, it can be caught.....
     Promise.resolve(fn(req,res,next))
+        
+    
         // If an error occurs inside fn, the .catch(next) will catch it.
         // 'next' is a function provided by Express to handle errors.
         // Calling next(error) passes the error to Express's built-in error handler.
