@@ -5,22 +5,17 @@ import { asyncHandler } from "../utils/asyncHandeler.js";
 import uploadOnCloudinary from "../utils/cloudninary.js";
 
 const generateAccessandRefreshToken = async (userId) => {
-  try {
-    const user = await User.findOne(userId);
-    const accessToken = user.generateAccessToken();
-    const refreshToken = user.generateRefreshToken();
 
-    user.refreshToken = refreshToken;
-    await user.save({ validateBeforeSave: false });
-    return { accessToken, refreshToken };
-  } catch (error) {
-    throw new ApiError(
-      500,
-      "somehing wrong with generating accessa and refresh token"
-    );
-  }
-};
-
+    //  console.log(userId)
+     const user = await User.findOne(userId);
+    //  console.log(user)
+     const accessToken = user.generateAccessToken();
+    //  console.log(accessToken)
+     const refreshToken = user.generateRefreshToken();
+     user.refreshToken = refreshToken;
+     await user.save({ validateBeforeSave: false });
+     return { accessToken, refreshToken };
+}
 const userRegister = asyncHandler(async (req, res) => {
   // Extensive Debugging Logs
 
@@ -182,28 +177,30 @@ const userRegister = asyncHandler(async (req, res) => {
 // Would you like me to elaborate on any of these steps?
 const userLogin = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
+//   console.log(email);
+//   console.log(password);
 
-  const emailTrimmed = email.trim().toLowerCase();
-  if (emailTrimmed === "") {
+  if (!email) {
     throw new ApiError(401, "email xaina halako");
   }
 
-  const existingUser = await User.findOne({ email: emailTrimmed });
+  const existingUser = await User.findOne({ email }).select("+password");
   if (!existingUser) {
     throw new ApiError(401, `this emali ${email} is not registered`);
   }
+//   console.log(`this email ${existingUser} is in db`);
 
   const isPasswordValid = await existingUser.isPasswordCorrect(password);
-
+//   console.log(isPasswordValid);
   if (!isPasswordValid) {
     throw new ApiError(401, "incorrect password");
   }
-
+  console.log(existingUser._id)
   const { accessToken, refreshToken } = await generateAccessandRefreshToken(
     existingUser._id
   );
 
-  const loggedInUser = User.findOne(existingUser._id).select(
+  const loggedInUser = await User.findOne(existingUser._id).select(
     "-password -refreshToken"
   );
 
@@ -217,44 +214,34 @@ const userLogin = asyncHandler(async (req, res) => {
     .cookie("accessToken", accessToken, options)
     .cookie("refreshToken", refreshToken, options)
     .json(
-      new ApiResponse(
-        200,
-        {
-          user: loggedInUser,
-          accessToken,
-          refreshToken,
-        },
-        "user successfully loggedIn"
-      )
+      new ApiResponse(200,{user: loggedInUser,accessToken,refreshToken},"User logged in successully")
     );
 });
 
-const loggedOut = asyncHandler(async(req,res)=>{
-             await User.findByIdAndUpdate(
-                req.user._id,
-                {
-                    $unset:{
-                        refreshToken: 1
-                    }
-                },
-                {
-                    new:true
-                }
-             )
-             const options ={
-                httpOnly: true,
-                secure: true
-             }
-             return res
-             .status(200)
-             .clearcookies("accessToken",options)
-             .clearcookies("refreshToken",options)
-             .json(
-                new ApiResponse(200,{},"user logged out")
-             )
-})
+const userLogout = asyncHandler(async (req, res) => {
+  await User.findByIdAndUpdate(
+    req.user._id,
+    {
+      $unset: {
+        refreshToken: 1,
+      },
+    },
+    {
+      new: true,
+    }
+  );
+  const options = {
+    httpOnly: true,
+    secure: true,
+  };
+  return res
+    .status(200)
+    .clearcookies("accessToken", options)
+    .clearcookies("refreshToken", options)
+    .json(new ApiResponse(200, {}, "user logged out"));
+});
 
-export { userRegister, userLogin };
+export { userRegister, userLogin, userLogout };
 
 // 🚀 **User Registration Flow**
 // This function handles user registration with validation, duplicate checks, avatar uploads, and database entry creation.
