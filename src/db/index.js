@@ -12,13 +12,13 @@ const connectDatabase = async () => {
         console.log(`\n ✅ MongoDB connected successfully at: ${connectionInstance.connection.host}`);
         
         // Try to drop the problematic userName index
-        try {
-            await User.collection.dropIndex('userName_1');
-            console.log('✅ Dropped userName index successfully');
-        } catch (indexDropError) {
-            // This will catch and log if the index doesn't exist or can't be dropped
-            console.log('ℹ️ No userName index found or error dropping index:', indexDropError.message);
-        }
+        // try {
+        //     await User.collection.dropIndex('userName_1');
+        //     console.log('✅ Dropped userName index successfully');
+        // } catch (indexDropError) {
+        //     // This will catch and log if the index doesn't exist or can't be dropped
+        //     console.log('ℹ️ No userName index found or error dropping index:', indexDropError.message);
+        // }
         
         return connectionInstance;
     } catch (error) {

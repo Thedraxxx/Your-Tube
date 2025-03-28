@@ -1,18 +1,18 @@
-//asynchandeler is a function that take another function(fn) as an argument....
-//This function is usually an async function that handles a request in Express......
-const asyncHandler = (fn)=>{ return (req,res,next) => {
-    //promise.resolve runs the provided function and ensure it always return the promises.....
-    //This is imp because if fn is an async function it misght throw an error....
-    //this function is wrapped in promise.rosolve() to make sure that even if fn fails, it can be caught.....
-    Promise.resolve(fn(req,res,next))
+// 🚀 asyncHandler: A utility function to handle errors in async route handlers
+
+const asyncHandler = (fn) => { 
+    return (req, res, next) => {  // 👈 This is the returned middleware function that Express will execute
         
-    
-        // If an error occurs inside fn, the .catch(next) will catch it.
-        // 'next' is a function provided by Express to handle errors.
-        // Calling next(error) passes the error to Express's built-in error handler.
-    .catch(next);
-}
-}
+        // 🛠 Ensures the function always returns a Promise
+        // If `fn` is an async function, it might throw an error.
+        // Wrapping `fn(req, res, next)` inside `Promise.resolve()` ensures it always returns a Promise.
+        Promise.resolve(fn(req, res, next)) 
 
+        // 🔥 If an error occurs inside `fn`, catch it and pass it to Express's built-in error handler
+        // `next(error)` will send the error to the next middleware (which should handle errors)
+        .catch(next);
+    }
+};
 
-export {asyncHandler}
+// 🎯 Exporting asyncHandler so it can be used in other files
+export { asyncHandler };

@@ -1,6 +1,7 @@
 import { Router } from "express";
-import userRegister from "../controllers/user.controller.js";
+import { userRegister } from "../controllers/user.controller.js";
 import  upload  from "../middlwares/multer.middleware.js";
+import jwtvarify from "../middlwares/auth.middleware.js";
 
 
 const userRouter = Router();
@@ -17,6 +18,10 @@ userRouter.route("/register").post(  // middleware befor the user register for f
         }
     ]),
     userRegister)
+
+    userRouter.route("/login").post(upload.none(),jwtvarify,
+    userRegister
+)
 
 
 export default userRouter;
