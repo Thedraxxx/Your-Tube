@@ -9,9 +9,9 @@ const jwtvarify = asyncHandler(async (req, _, next) => {
     const token =
       req.cookies?.accessToken ||
       req.header("Authorization")?.replace("Bearer ", "");
-    console.log(token);
-    console.log("cookies : ",req.cookies)
-    console.log("auth header : ",req.header("Authorization"));
+    // console.log(token);
+    // console.log("cookies : ",req.cookies)
+    // console.log("auth header : ",req.header("Authorization"));
     if (!token) {
       throw new ApiError(401, "Unauthorized access");
     }

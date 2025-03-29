@@ -3,35 +3,25 @@ import ApiError from "../utils/APIError.js";
 import ApiResponse from "../utils/APIrsponse.js";
 import { asyncHandler } from "../utils/asyncHandeler.js";
 import uploadOnCloudinary from "../utils/cloudninary.js";
-
+import jwt from "jsonwebtoken";
+/*
+      Generate access and refresh token using methods from User.
+*/
 const generateAccessandRefreshToken = async (userId) => {
+  const user = await User.findOne(userId);
 
-    //  console.log(userId)
-     const user = await User.findOne(userId);
-    //  console.log(user)
-     const accessToken = user.generateAccessToken();
-    //  console.log(accessToken)
-     const refreshToken = user.generateRefreshToken();
-     user.refreshToken = refreshToken;
-     await user.save({ validateBeforeSave: false });
-     return { accessToken, refreshToken };
-}
+  const accessToken = user.generateAccessToken();
+
+  const refreshToken = user.generateRefreshToken();
+  user.refreshToken = refreshToken;
+  await user.save({ validateBeforeSave: false });
+  return { accessToken, refreshToken };
+};
+/*
+    User Registration 
+*/
 const userRegister = asyncHandler(async (req, res) => {
-  // Extensive Debugging Logs
-
-  // console.log("==== REGISTRATION DEBUG ====");
-  // console.log("Full Request Body:", JSON.stringify(req.body, null, 2));
-  // console.log("Request Files:", JSON.stringify(req.files, null, 2));
-
   const { username, email, password, fullname } = req.body;
-
-  // Comprehensive validation with detailed logging
-
-  // console.log("Validation Checks:");
-  // console.log("username:", username);
-  // console.log("email:", email);
-  // console.log("password:", password ? "***MASKED***" : "MISSING");
-  // console.log("fullname:", fullname);
 
   if (!username || !email || !password || !fullname) {
     console.error("Missing Fields Detected");
@@ -47,11 +37,6 @@ const userRegister = asyncHandler(async (req, res) => {
       $or: [{ username: usernameTrimmed }, { email: emailTrimmed }],
     });
 
-    // Log existing user details
-
-    // console.log("Existing User Check Result:");
-    // console.log(existingUser ? JSON.stringify(existingUser, null, 2) : "No existing user found");
-
     if (existingUser) {
       const conflictField =
         existingUser.username === usernameTrimmed ? "username" : "email";
@@ -61,7 +46,6 @@ const userRegister = asyncHandler(async (req, res) => {
 
     // Handle avatar upload
     const avatarLocalPath = req.files?.avatar?.[0]?.path;
-    // console.log("Avatar Local Path:", avatarLocalPath);
 
     if (!avatarLocalPath) {
       throw new ApiError(400, "Avatar file is required");
@@ -83,15 +67,6 @@ const userRegister = asyncHandler(async (req, res) => {
         coverImage ? "Success" : "Failed"
       );
     }
-
-    // Create user
-    // console.log("Creating User with Details:");
-    // console.log("Fullname:", fullname);
-    // console.log("Avatar URL:", avatar.url);
-    // console.log("Cover Image URL:", coverImage?.url || "None");
-    // console.log("Email:", emailTrimmed);
-    // console.log("Username:", usernameTrimmed);
-
     const user = await User.create({
       fullname,
       avatar: avatar.url,
@@ -121,64 +96,11 @@ const userRegister = asyncHandler(async (req, res) => {
     throw error;
   }
 });
-// Here's a step-by-step guide for implementing login functionality:
-
-// 1. Controller Location
-// - Create the login logic in the same `user.controller.js` file
-// - Name the function something like `userLogin`
-
-// 2. Input Validation
-// - Check if email and password are provided
-// - Trim and validate email format
-// - Ensure password meets basic requirements
-
-// 3. Database Query
-// - Find user by email in the database
-// - Use `.select("+password")` to include the password field
-// - Check if user exists
-
-// 4. Password Verification
-// - Use the `isPasswordCorrect` method from your user model
-// - Compare the provided password with stored hash
-// - Handle incorrect password scenarios
-
-// 5. Token Generation
-// - Generate access token using `generateAccessToken()`
-// - Generate refresh token using `generateRefreshToken()`
-// - Consider storing refresh token in database (optional)
-
-// 6. Response Handling
-// - Create a response with user details
-// - Exclude sensitive information (password, tokens)
-// - Set up cookie options for tokens
-// - Use `ApiResponse` utility for consistent response format
-
-// 7. Route Setup
-// - Add a new POST route in `user.routes.js`
-// - Map the login controller to this route
-
-// 8. Error Handling
-// - Use `ApiError` for different error scenarios
-// - Handle cases like:
-//   - User not found
-//   - Incorrect password
-//   - Missing credentials
-
-// 9. Security Considerations
-// - Use HTTPS in production
-// - Implement httpOnly cookies
-// - Set appropriate token expiration
-
-// 10. Optional Enhancements
-// - Add login attempt tracking
-// - Implement basic rate limiting
-// - Log login attempts
-
-// Would you like me to elaborate on any of these steps?
+/*
+   User Login ...
+*/
 const userLogin = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
-//   console.log(email);
-//   console.log(password);
 
   if (!email) {
     throw new ApiError(401, "email xaina halako");
@@ -188,14 +110,13 @@ const userLogin = asyncHandler(async (req, res) => {
   if (!existingUser) {
     throw new ApiError(401, `this emali ${email} is not registered`);
   }
-//   console.log(`this email ${existingUser} is in db`);
 
   const isPasswordValid = await existingUser.isPasswordCorrect(password);
-//   console.log(isPasswordValid);
+
   if (!isPasswordValid) {
     throw new ApiError(401, "incorrect password");
   }
-  console.log(existingUser._id)
+  // console.log(existingUser._id);
   const { accessToken, refreshToken } = await generateAccessandRefreshToken(
     existingUser._id
   );
@@ -214,10 +135,16 @@ const userLogin = asyncHandler(async (req, res) => {
     .cookie("accessToken", accessToken, options)
     .cookie("refreshToken", refreshToken, options)
     .json(
-      new ApiResponse(200,{user: loggedInUser,accessToken,refreshToken},"User logged in successully")
+      new ApiResponse(
+        200,
+        { user: loggedInUser, accessToken, refreshToken },
+        "User logged in successully"
+      )
     );
 });
-
+/*
+   User Logged Out
+*/
 const userLogout = asyncHandler(async (req, res) => {
   await User.findByIdAndUpdate(
     req.user._id,
@@ -240,46 +167,45 @@ const userLogout = asyncHandler(async (req, res) => {
     .clearCookie("refreshToken", options)
     .json(new ApiResponse(200, {}, "user logged out"));
 });
+/*
+   Refreshing Access Token
+*/
+const refreshingAccessToken = asyncHandler(async(req,res)=>{
+       const incommingRefreshToken =  req.cookies.refreshToken || req.body.refreshToken;
+       if(!incommingRefreshToken){
+        throw new ApiError(401,"Unauthorized access");
+       }
+
+     const decodedToken = jwt.verify(incommingRefreshToken,process.env.REFRESH_TOKEN_SECRET);
+       const user = await User.findById(decodedToken?._id);
+       if (!user) {
+        throw new ApiError(401, "Invalid refresh token")
+    }
+    if (incommingRefreshToken !== user?.refreshToken) {
+      throw new ApiError(401, "Refresh token is expired or used")
+  }
+
+  const {accessToken,newrefreshToken}= await generateAccessandRefreshToken(user._id);
+
+  options ={
+    httpOnly: true,
+    secure: true,
+  }
+
+  return res.status(200)
+  .cookie("accessToken",accessToken,options)
+  .cookie("refreshToken",newrefreshToken,options)
+  .json(
+    new ApiResponse(
+      200, 
+      {accessToken, refreshToken: newrefreshToken},
+      "Access token refreshed"
+  )
+
+  )
+
+
+})
 
 export { userRegister, userLogin, userLogout };
 
-// 🚀 **User Registration Flow**
-// This function handles user registration with validation, duplicate checks, avatar uploads, and database entry creation.
-
-// 1️⃣ **Extract User Details**:
-// Retrieve user details like username, email, password, and avatar from `req.body`.
-// 🧠 **Tip**: Always ensure the frontend sends correct and complete data for registration.
-
-// 2️⃣ **Input Validation**:
-// Check if all required fields (username, email, password, fullname) are provided and non-empty.
-// 🔑 **Tip**: Validate inputs before processing. Use libraries like `Joi` or `express-validator` for more advanced validation.
-
-// Example:
-// `if([username, email, password, fullname].some(field => field?.trim() === ""))`
-
-//3️⃣ **Check for Duplicates**:
-// Check if the username or email already exists in the database. Throw a conflict error (`409`) if they exist.
-// 🛑 **Tip**: Avoid duplication to maintain clean data and prevent errors in future requests.
-
-// 4️⃣ **Handle Avatar Upload**:
-// If the user provides an avatar, upload it to Cloudinary and store the URL in the database.
-// 💡 **Tip**: Always upload avatars or images to a cloud storage (like Cloudinary) instead of saving locally to save storage space.
-//   Handle image upload errors gracefully and inform the user if it fails.
-
-// 5️⃣ **Create User in Database**:
-// Save the user data in the database, ensuring that sensitive data like passwords are hashed before storage.
-// 🧩 **Tip**: Use tools like `bcryptjs` for hashing passwords. Always store data securely!
-
-// 6️⃣ **Filter Sensitive Data**:
-// Remove sensitive information (passwords, refresh tokens) before sending the response back to the user.
-// 🛡️ **Tip**: **Never** return sensitive data in API responses to protect user privacy. Only return safe data (username, avatar URL, etc.).
-
-// 7️⃣ **Return Success Response**:
-// After creating the user, send a success message with the user's non-sensitive information, such as their username and avatar URL.
-// 💡 **Tip**: Always return clear, friendly, and useful responses to frontend developers so they know exactly what data to expect.
-
-// ⚡ **Additional Future-Proof Tips**:
-// - **Error Handling**: Use `try-catch` blocks and custom error handling middleware to keep your code clean. It helps to standardize error responses across your app.
-// - **Scalability**: As your app grows, consider implementing rate-limiting and input sanitization to prevent abuse and security issues.
-// - **Password Recovery**: Plan for password recovery flows in the future using email verification or security questions.
-// - **JWT**: Implement JSON Web Tokens (JWT) or other token-based authentication to manage user sessions securely.
