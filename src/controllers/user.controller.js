@@ -207,5 +207,5 @@ const refreshingAccessToken = asyncHandler(async(req,res)=>{
 
 })
 
-export { userRegister, userLogin, userLogout };
+export { userRegister, userLogin, userLogout, refreshingAccessToken };
 

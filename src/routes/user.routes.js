@@ -2,8 +2,8 @@ import { Router } from "express";
 import { userRegister } from "../controllers/user.controller.js";
 import  upload  from "../middlwares/multer.middleware.js";
 import jwtvarify from "../middlwares/auth.middleware.js";
-import { userLogin } from "../controllers/user.controller.js";
-import { userLogout } from "../controllers/user.controller.js";
+
+import { userLogin , userLogout , refreshingAccessToken } from "../controllers/user.controller.js";
 
 const userRouter = Router();
 
@@ -23,6 +23,7 @@ userRouter.route("/register").post(  // middleware befor the user register for f
     userRouter.route("/logout").post(jwtvarify,
     userLogout
 )
+userRouter.route("/refres-token").post(refreshingAccessToken);
 
 
 export default userRouter;
