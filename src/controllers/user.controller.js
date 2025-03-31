@@ -101,7 +101,7 @@ const userRegister = asyncHandler(async (req, res) => {
 */
 const userLogin = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
-
+  
   if (!email) {
     throw new ApiError(401, "email xaina halako");
   }
@@ -205,7 +205,30 @@ const refreshingAccessToken = asyncHandler(async(req,res)=>{
   )
 
 
-})
+});
+/*
+   Change current password
+*/
+const changeCurrentPassword = asyncHandler(async(req,res)=>{
+      const {oldPassword, newPassword, }= req.body;
+      // console.log(req.body)
+      // console.log("old password: ", oldPassword)
+      const user = await User.findById(req.user?._id).select("+password");  // password add garnu parxa 
+      console.log(req.user?._id);
+      console.log(user);
+       const isPasswordvalid = await user.isPasswordCorrect(oldPassword);
+       console.log(isPasswordvalid);
+       if(!isPasswordvalid){ 
+        throw new ApiError(401,"Invalid password");
+       };
 
-export { userRegister, userLogin, userLogout, refreshingAccessToken };
+   user.password = newPassword;
+   await user.save({validateBeforeSave: false});
+
+   return res.status(200).json(
+    new ApiResponse(200,{},"password changed successfully")
+   )
+});
+
+export { userRegister, userLogin, userLogout, refreshingAccessToken, changeCurrentPassword };
 
