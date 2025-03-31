@@ -101,7 +101,7 @@ const userRegister = asyncHandler(async (req, res) => {
 */
 const userLogin = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
-  
+
   if (!email) {
     throw new ApiError(401, "email xaina halako");
   }
@@ -170,65 +170,88 @@ const userLogout = asyncHandler(async (req, res) => {
 /*
    Refreshing Access Token
 */
-const refreshingAccessToken = asyncHandler(async(req,res)=>{
-       const incommingRefreshToken =  req.cookies.refreshToken || req.body.refreshToken;
-       if(!incommingRefreshToken){
-        throw new ApiError(401,"Unauthorized access");
-       }
-
-     const decodedToken = jwt.verify(incommingRefreshToken,process.env.REFRESH_TOKEN_SECRET);
-       const user = await User.findById(decodedToken?._id);
-       if (!user) {
-        throw new ApiError(401, "Invalid refresh token")
-    }
-    if (incommingRefreshToken !== user?.refreshToken) {
-      throw new ApiError(401, "Refresh token is expired or used")
+const refreshingAccessToken = asyncHandler(async (req, res) => {
+  const incommingRefreshToken =
+    req.cookies.refreshToken || req.body.refreshToken;
+  if (!incommingRefreshToken) {
+    throw new ApiError(401, "Unauthorized access");
   }
 
-  const {accessToken,newrefreshToken}= await generateAccessandRefreshToken(user._id);
+  const decodedToken = jwt.verify(
+    incommingRefreshToken,
+    process.env.REFRESH_TOKEN_SECRET
+  );
+  const user = await User.findById(decodedToken?._id);
+  if (!user) {
+    throw new ApiError(401, "Invalid refresh token");
+  }
+  if (incommingRefreshToken !== user?.refreshToken) {
+    throw new ApiError(401, "Refresh token is expired or used");
+  }
 
-  options ={
+  const { accessToken, newrefreshToken } = await generateAccessandRefreshToken(
+    user._id
+  );
+
+  options = {
     httpOnly: true,
     secure: true,
-  }
+  };
 
-  return res.status(200)
-  .cookie("accessToken",accessToken,options)
-  .cookie("refreshToken",newrefreshToken,options)
-  .json(
-    new ApiResponse(
-      200, 
-      {accessToken, refreshToken: newrefreshToken},
-      "Access token refreshed"
-  )
-
-  )
-
-
+  return res
+    .status(200)
+    .cookie("accessToken", accessToken, options)
+    .cookie("refreshToken", newrefreshToken, options)
+    .json(
+      new ApiResponse(
+        200,
+        { accessToken, refreshToken: newrefreshToken },
+        "Access token refreshed"
+      )
+    );
 });
 /*
    Change current password
 */
-const changeCurrentPassword = asyncHandler(async(req,res)=>{
-      const {oldPassword, newPassword, }= req.body;
-      // console.log(req.body)
-      // console.log("old password: ", oldPassword)
-      const user = await User.findById(req.user?._id).select("+password");  // password add garnu parxa 
-      console.log(req.user?._id);
-      console.log(user);
-       const isPasswordvalid = await user.isPasswordCorrect(oldPassword);
-       console.log(isPasswordvalid);
-       if(!isPasswordvalid){ 
-        throw new ApiError(401,"Invalid password");
-       };
+const changeCurrentPassword = asyncHandler(async (req, res) => {
+  const { oldPassword, newPassword } = req.body;
+  // console.log(req.body)
+  // console.log("old password: ", oldPassword)
+  const user = await User.findById(req.user?._id).select("+password"); // password add garnu parxa
+  // console.log(req.user?._id);
+  // console.log(user);
+  const isPasswordvalid = await user.isPasswordCorrect(oldPassword);
+  //  console.log(isPasswordvalid);
+  if (!isPasswordvalid) {
+    throw new ApiError(401, "Invalid password");
+  }
 
-   user.password = newPassword;
-   await user.save({validateBeforeSave: false});
+  user.password = newPassword;
+  await user.save({ validateBeforeSave: false });
 
-   return res.status(200).json(
-    new ApiResponse(200,{},"password changed successfully")
-   )
+  return res
+    .status(200)
+    .json(new ApiResponse(200, {}, "password changed successfully"));
 });
+/*
+   get current User
+*/
+const getCurrentUser = asyncHandler(async (req, res) => {
+  return res
+    .status(200)
+    .json(new ApiResponse(200, req.user, "Fetched current user")); // this uer come form the jwtverify middleare ...
+});
+/*
+  update accout details like email fullname
+*/
 
-export { userRegister, userLogin, userLogout, refreshingAccessToken, changeCurrentPassword };
 
+export {
+  userRegister,
+  userLogin,
+  userLogout,
+  refreshingAccessToken,
+  changeCurrentPassword,
+  getCurrentUser,
+ 
+};
