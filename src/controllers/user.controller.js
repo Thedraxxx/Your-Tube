@@ -244,7 +244,26 @@ const getCurrentUser = asyncHandler(async (req, res) => {
 /*
   update accout details like email fullname
 */
+const updateAccountDetails = asyncHandler(async (req, res) => {
+  const { fullname, email } = req.body;
 
+  if (!fullname || !email) {
+    throw new ApiError(401, "invalid info");
+  }
+
+  const user = await User.findByIdAndUpdate(
+    req.user?._id,
+    {
+      $set: { email, fullname },
+    },
+    {
+      new: true,
+    }
+  ).select("-password");
+  return res
+    .status(200)
+    .json(new ApiResponse(300, user, "Account details update successfully"));
+});
 
 export {
   userRegister,
@@ -253,5 +272,5 @@ export {
   refreshingAccessToken,
   changeCurrentPassword,
   getCurrentUser,
- 
+  updateAccountDetails,
 };
