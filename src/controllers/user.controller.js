@@ -4,6 +4,7 @@ import ApiResponse from "../utils/APIrsponse.js";
 import { asyncHandler } from "../utils/asyncHandeler.js";
 import uploadOnCloudinary from "../utils/cloudninary.js";
 import jwt from "jsonwebtoken";
+import cloudinary from "cloudinary"
 /*
       Generate access and refresh token using methods from User.
 */
@@ -264,6 +265,55 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(300, user, "Account details update successfully"));
 });
+/*
+   update avatar
+*/
+const updateAvatar = asyncHandler(async (req, res) => {
+  console.log("req body: ",req.body)
+  console.log(req.file)
+  const avatarLocalPath = req.file?.path;
+  console.log("avatarPath",avatarLocalPath)
+  if (!avatarLocalPath) {
+    throw new ApiError(201, "invalid avatarLocalPath");
+  }
+
+  //delete the existing avatarLocalPath
+  const user = await User.findById(req.user?._id);
+
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+
+  // Step 4: Check if there is an existing avatar and delete it if it exists.
+  if (user.avatar) {
+    // Assuming the URL in the database contains the Cloudinary public ID (e.g., 'https://res.cloudinary.com/.../image.jpg').
+    const publicId = user.avatar.split("/").pop().split(".")[0]; // Extract the public ID from the URL.
+
+    // Call Cloudinary API to delete the old avatar.
+    const deleteResult = await cloudinary.uploader.destroy(publicId);
+
+    if (deleteResult.result !== "ok") {
+      throw new ApiError(400, "Error while deleting old avatar");
+    }
+  }
+
+  const avatar = await uploadOnCloudinary(avatarLocalPath);
+  if (!avatar.url) {
+    throw new ApiError(400, "Error while uploading avatar");
+  }
+  const updatedUser = await User.findByIdAndUpdate(
+    req.user?._id,
+    {
+      $set: { avatar: avatar.url },
+    },
+    {
+      new: true,
+    }
+  ).select("-password");
+  return res
+    .status(200)
+    .json(new ApiResponse(200, updatedUser, "avatar updated successfully"));
+});
 
 export {
   userRegister,
@@ -273,4 +323,5 @@ export {
   changeCurrentPassword,
   getCurrentUser,
   updateAccountDetails,
+  updateAvatar,
 };

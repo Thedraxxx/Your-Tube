@@ -9,7 +9,8 @@ import {
   userLogout,
   refreshingAccessToken,
   changeCurrentPassword,
-  updateAccountDetails
+  updateAccountDetails,
+  updateAvatar
 } from "../controllers/user.controller.js";
 
 const userRouter = Router();
@@ -33,5 +34,6 @@ userRouter.route("/logout").post(jwtvarify, userLogout);
 userRouter.route("/refres-token").post(refreshingAccessToken);
 userRouter.route("/change-Password").post(upload.none(),jwtvarify,changeCurrentPassword);
 userRouter.route("/change-details").patch(upload.none(),jwtvarify,updateAccountDetails);
+userRouter.route("/change-avatar").patch(upload.single("avatar"),jwtvarify,updateAvatar)
 
 export default userRouter;
