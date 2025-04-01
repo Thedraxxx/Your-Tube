@@ -4,7 +4,7 @@ import ApiResponse from "../utils/APIrsponse.js";
 import { asyncHandler } from "../utils/asyncHandeler.js";
 import uploadOnCloudinary from "../utils/cloudninary.js";
 import jwt from "jsonwebtoken";
-import cloudinary from "cloudinary"
+import cloudinary from "cloudinary";
 /*
       Generate access and refresh token using methods from User.
 */
@@ -269,10 +269,10 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
    update avatar
 */
 const updateAvatar = asyncHandler(async (req, res) => {
-  console.log("req body: ",req.body)
-  console.log(req.file)
+  console.log("req body: ", req.body);
+  // console.log(req.file);
   const avatarLocalPath = req.file?.path;
-  console.log("avatarPath",avatarLocalPath)
+  // console.log("avatarPath", avatarLocalPath);
   if (!avatarLocalPath) {
     throw new ApiError(201, "invalid avatarLocalPath");
   }
@@ -314,6 +314,50 @@ const updateAvatar = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, updatedUser, "avatar updated successfully"));
 });
+/*
+   update cover photo
+*/
+const updateCoverImage = asyncHandler(async (req, res) => {
+  const coverImageLocalPath = req.file?.path;
+  console.log(req.file?.path);
+
+  if (!coverImageLocalPath) {
+    throw new ApiError(401, "invalid image path");
+  }
+
+  // delete the older image path form clounary and db
+  const user = await  User.findById(req.user?._id);
+  if (!user) {
+    throw new ApiError(401, "no user found");
+  }
+  if (user.coverImage) {
+    const publicId = user.coverImage.split("/").pop().split(".")[0];
+    const deleteResult = await cloudinary.uploader.destroy(publicId);
+    if (deleteResult.result !== "ok") {
+      throw new ApiError(400, "Error while deleting old avatar");
+    }
+  }
+  // now upload to cloudnary
+
+  const coverImage = await uploadOnCloudinary(coverImageLocalPath);
+  if (!coverImage.url) {
+    throw new ApiError(401, "error while uploading cover image");
+  }
+
+  const updatedUser = await User.findByIdAndUpdate(
+    req.user?._id,
+    {
+      $set: { coverImage: coverImage.url },
+    },
+    {
+      new: true,
+    }
+  ).select("-password");
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, updatedUser, "image update successfully"));
+});
 
 export {
   userRegister,
@@ -324,4 +368,5 @@ export {
   getCurrentUser,
   updateAccountDetails,
   updateAvatar,
+  updateCoverImage,
 };
