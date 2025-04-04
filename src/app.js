@@ -1,35 +1,27 @@
-import express from "express";  // Importing Express framework
-import cors from "cors";        // Importing CORS middleware to handle cross-origin requests
-import cookieParser from "cookie-parser"; // Importing middleware to parse cookies
+import express from "express";                  // Express framework
+import cors from "cors";                        // Handles Cross-Origin Resource Sharing
+import cookieParser from "cookie-parser";       // Parses cookies from requests
 
-const app = express(); // Creating an Express application instance
-// Middleware to handle Cross-Origin Resource Sharing (CORS)
-// It allows requests from different origins specified in the environment variable `CORS_ORIGIN`
+const app = express();                          // Create an Express application
+
+// CORS Middleware – allows requests from specific origin
 app.use(cors({
-    origin: process.env.CORS_ORIGIN // Only allows requests from this origin
+    origin: process.env.CORS_ORIGIN,           // Set allowed origin from environment variable
+    credentials: true                          // Allow cookies to be sent from frontend
 }));
 
-// Middleware to parse JSON data from incoming requests
-// `limit: "20kb"` restricts JSON payload size to 20 kilobytes to prevent large payload attacks
-app.use(express.json({
-    limit: "20kb"
-}));
+// Body Parsers
+app.use(express.json({ limit: "20kb" }));       // Parse JSON requests (limit: 20kb)
+app.use(express.urlencoded({ extended: true, limit: "16kb" })); // Parse URL-encoded data
 
-// Middleware to serve static files (like images, CSS, JS) from the "public" directory
-app.use(express.static("public"));
+// Static File Serving
+app.use(express.static("public"));              // Serve static files from "public" folder
 
-// Middleware to parse URL-encoded data (e.g., form submissions)
-// `extended: true` allows nested objects in query strings
-// `limit: "16kb"` restricts the payload size to 16 kilobytes
-app.use(express.urlencoded({ extended: true, limit: "16kb" }));
+// Cookie Parser
+app.use(cookieParser());                        // Parse cookies and attach to req.cookies
 
-// Middleware to parse cookies from incoming requests
-// This makes cookies accessible through `req.cookies`
-app.use(cookieParser());
-
-//Routes
+// Routes
 import userRouter from "./routes/user.routes.js";
-// route declaration....
-app.use("/api/v2/users",userRouter)
+app.use("/api/v2/users", userRouter);           // Mount user-related routes
 
-export default app; // Exporting the app instance for use in other files (e.g., server.js)
+export default app;                             // Export app instance for use in server.js

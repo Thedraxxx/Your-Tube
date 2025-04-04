@@ -5,6 +5,7 @@ import { asyncHandler } from "../utils/asyncHandeler.js";
 import uploadOnCloudinary from "../utils/cloudninary.js";
 import jwt from "jsonwebtoken";
 import cloudinary from "cloudinary";
+import mongoose from "mongoose";
 /*
       Generate access and refresh token using methods from User.
 */
@@ -424,8 +425,6 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
     new ApiResponse(200, channel[0], "User channel fetched successfully")
   );
 });
-
-
 /*
   GET watch history
 */
@@ -482,7 +481,6 @@ const getWatchHistory = asyncHandler(async(req, res) => {
       )
   )
 })
-
 export {
   userRegister,
   userLogin,
