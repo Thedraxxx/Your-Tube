@@ -2,7 +2,6 @@ import { asyncHandler } from "../utils/asyncHandeler.js";
 import { Video } from "../models/video.model.js";
 import ApiResponse from "../utils/APIrsponse.js";
 import ApiError from "../utils/APIError.js";
-import cloudnary from "cloudinary";
 import { getPublicIdFromUrl, deleteFromCloudinary,uploadOnCloudinary } from "../utils/cloudninary.js";
 
 const fetchVideo = asyncHandler(async (req, res) => {
@@ -21,7 +20,7 @@ const fetchVideo = asyncHandler(async (req, res) => {
   if (query) {
     matchStage.$or = [
       { title: { $regex: query, $options: "i" } },
-      { discription: { $regex: query, $options: "i" } },
+      { description: { $regex: query, $options: "i" } },
     ];
   }
   if (owner) {
@@ -47,14 +46,17 @@ const fetchVideo = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, result, "videos fetchd successfully."));
 });
 const uploadVideo = asyncHandler(async (req, res) => {
-  const { title, discription } = req.body;
-
-  if (!title.trim() || !discription.trim()) {
+  const { title, description } = req.body;
+console.log(req.body)
+  if (!title.trim() || !description.trim()) {
     throw new ApiError(400, "this feild are required");
   }
-  const videoLocalPath = req.file?.video?.[0]?.path;
-  const thumbnailLocalpath = req.file?.thumbnail?.[0]?.path;
-
+  
+  console.log(req.files)
+  const videoLocalPath = req.files?.videos?.[0]?.path;
+  const thumbnailLocalpath = req.files?.thumbnail?.[0]?.path;
+ console.log("video: ",videoLocalPath)
+ console.log("thumbnail: ",thumbnailLocalpath)
   if (!videoLocalPath || !thumbnailLocalpath) {
     throw new ApiError(400, "no files uploaded");
   }
@@ -68,9 +70,9 @@ const uploadVideo = asyncHandler(async (req, res) => {
   }
   const videoUpload = await Video.create({
     title,
-    discription,
+    description,
     thumbnail: thumbnail.url,
-    video: video.url,
+    videoFile: video.url,
     duration: video.duration,
   });
   return res
@@ -94,7 +96,7 @@ const deleteVideo = asyncHandler(async (req, res) => {
 
   await deleteFromCloudinary(videoPublicId, "video");
   await deleteFromCloudinary(thumbnailPublicId, "image");
-  
+
   await video.deleteOne();
   return res.status(200).json(new ApiResponse(200, null, "video is deleted."));
 });
