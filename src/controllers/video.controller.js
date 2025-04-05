@@ -17,12 +17,14 @@ const fetchVideo = asyncHandler(async (req, res) => {
   const matchStage = {
     isPublished: true,
   };
+  console.log(matchStage)
   if (query) {
     matchStage.$or = [
       { title: { $regex: query, $options: "i" } },
       { description: { $regex: query, $options: "i" } },
     ];
   }
+  console.log(query)
   if (owner) {
     matchStage.owner = owner;
   }
@@ -74,24 +76,28 @@ console.log(req.body)
     thumbnail: thumbnail.url,
     videoFile: video.url,
     duration: video.duration,
+    owner: req.user._id,
   });
   return res
     .status(200)
     .json(new ApiResponse(200, videoUpload, "video publish successfully"));
 });
-const deleteVideo = asyncHandler(async (req, res) => {
-  const videoId = req.params?.id;
-  const userId = req.user?._id;
 
+const deleteVideo = asyncHandler(async (req, res) => {
+  const videoId = req.params?.id.trim();
+  const userId = req.user?._id;
+// console.log(videoId);
   const video = await Video.findById(videoId);
   if (!video) {
     throw new ApiError(404, "video not found.");
   }
-
+// console.log(video)
+// console.log(video.owner)
   if (video.owner.toString() !== userId.toString()) {
     throw new ApiError(403, "you are not authorized to delete this video.");
-  } 
-  const videoPublicId = getPublicIdFromUrl(video.videFile);
+  }
+//   console.log(video.videoFile)
+  const videoPublicId = getPublicIdFromUrl(video.videoFile);
   const thumbnailPublicId = getPublicIdFromUrl(video.thumbnail);
 
   await deleteFromCloudinary(videoPublicId, "video");
