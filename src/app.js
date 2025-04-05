@@ -22,6 +22,8 @@ app.use(cookieParser());                        // Parse cookies and attach to r
 
 // Routes
 import userRouter from "./routes/user.routes.js";
+import videoRouter from "./routes/videos.route.js";
 app.use("/api/v2/users", userRouter);           // Mount user-related routes
+app.user("/api/v2/videos",videoRouter);
 
 export default app;                             // Export app instance for use in server.js
