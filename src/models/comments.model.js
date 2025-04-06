@@ -11,7 +11,8 @@ const commentSchema = new mongoose.Schema({
            },
            videos: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "Videos"
+            ref: "Videos",
+            required: true
            }
 },{timestamps: true})
 commentSchema.plugin(mongooseAggregatePaginate)

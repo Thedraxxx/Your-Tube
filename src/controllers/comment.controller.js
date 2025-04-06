@@ -2,6 +2,7 @@ import ApiError from "../utils/APIError.js";
 import { asyncHandler } from "../utils/asyncHandeler.js";
 import Comment from "../models/comments.model.js";
 import ApiResponse from "../utils/APIrsponse.js";
+import mongoose from "mongoose";
 /*
   publish Comment..
 */
@@ -19,7 +20,7 @@ const publishComment = asyncHandler(async(req,res)=>{
       const commentContant = await  Comment.create({
             content,
             owner: userId,
-            video: videoId,
+            videos: videoId,
         });
         return res.status(200).json(
             new ApiResponse(200,commentContant,"commented successfully")
@@ -57,5 +58,42 @@ const deleteComment = asyncHandler(async(req,res)=> {
     new ApiResponse(200,{},"comment deleted successfully")
    )
 });
-// const editCommentt = asyncHandler(async(req,res)=> {});
-export {publishComment, editComment, deleteComment }
+const getVideoComment = asyncHandler(async(req,res)=> {
+     const { videoId } = req.params;
+      const page = parseInt(req.query.page)|| 1;
+      const limit = parseInt(req.query.limit) || 10;
+      console.log(videoId)
+const comments = await Comment.aggregate([
+    {$match: {videos: new mongoose.Types.ObjectId(videoId)}},
+    {$sort: {createdAt: -1}},
+    {$limit: limit},
+    {$skip: (page-1)*limit},
+    {$lookup: {
+        from: "users",  //arko collection bata laaunuxa
+        localField: "owner", //comment collection ma tyo unique key k vayrasave ca
+        foreignField: "_id", // user collection ma k vanara save xa 
+        as: "ownerDetails",
+    }},
+    {$unwind: "$ownerDetails"},
+    {$project: { // like kun kun chij matra display garna...
+       content: 1,
+       videos: 1,
+       createdAt: 1,
+       ownerDetails: {
+         _id: 1,
+         username: 1,
+         fullname: 1,
+         avatar: 1,
+       }
+    }}
+]);
+console.log(comments)
+if(!comments){
+    throw new ApiError(401,"comments not found");
+}
+
+return res.status(200).json(
+    new ApiResponse(200,comments, 'commeent fetche succcussfully.')
+)
+});
+export {publishComment, editComment, deleteComment, getVideoComment }
