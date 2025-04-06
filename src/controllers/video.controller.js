@@ -97,14 +97,14 @@ const uploadVideo = asyncHandler(async (req, res) => {
 const deleteVideo = asyncHandler(async (req, res) => {
   const videoId = req.params?.id.trim();
   const userId = req.user?._id;
-  // console.log(videoId);
+  console.log(videoId);
   const video = await Video.findById(videoId);
   if (!video) {
     throw new ApiError(404, "video not found.");
   }
-  // console.log(video)
-  // console.log(video.owner)
-  if (video.owner.toString() !== userId.toString()) {
+  console.log(video)
+  console.log(video.owner)
+  if (video.owner !== userId) {
     throw new ApiError(403, "you are not authorized to delete this video.");
   }
   //   console.log(video.videoFile)
@@ -124,7 +124,6 @@ const editVideo = asyncHandler(async (req, res) => {
   const { title, description } = req.body;
   const { videoId } = req.params;
 
-  // 1. Find the video by ID
   const video = await Video.findById(videoId);
 
   if (!video) {
@@ -133,21 +132,18 @@ const editVideo = asyncHandler(async (req, res) => {
     );
   }
 
-  // 2. (Optional) Check if the logged-in user owns the video
   if (video.owner.toString() !== req.user._id.toString()) {
     return res.status(403).json(
       new ApiResponse(403, null, "Not authorized to edit this video")
     );
   }
 
-  // 3. Replace title & description
   video.title = title || video.title;
   video.description = description || video.description;
 
-  // 4. Save the updated video
+
   const updatedVideo = await video.save();
 
-  // 5. Respond with success
   return res.status(200).json(
     new ApiResponse(200, updatedVideo, "Video details edited successfully")
   );
