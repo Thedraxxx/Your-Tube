@@ -45,6 +45,17 @@ const editComment = asyncHandler(async(req,res)=> {
         new ApiResponse(200,editedComment,"comment edited successfully")
     )
 });
-const deleteComment = asyncHandler(async(req,res)=> {});
-const editCommentt = asyncHandler(async(req,res)=> {});
+/*
+   delete commetn...
+*/
+const deleteComment = asyncHandler(async(req,res)=> {
+    const {commentId} = req.params;
+
+   const comment = await Comment.findById(commentId);
+   await comment.deleteOne();
+   return res.status(200).json(
+    new ApiResponse(200,{},"comment deleted successfully")
+   )
+});
+// const editCommentt = asyncHandler(async(req,res)=> {});
 export {publishComment, editComment, deleteComment }
