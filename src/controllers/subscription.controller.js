@@ -24,7 +24,7 @@ const toggleSubscriber = asyncHandler(async (req, res) => {
     subscriber: userId,
     channel: channelId,
   });
-  console.log(channelSubscribe);
+//   console.log(channelSubscribe);
   if (channelSubscribe) {
     await channelSubscribe.deleteOne();
     return res
@@ -45,4 +45,24 @@ const toggleSubscriber = asyncHandler(async (req, res) => {
   }
 });
 
-export { toggleSubscriber };
+const getUserChannelSubscribers = asyncHandler(async(req,res)=>{
+    
+
+        const {channelId} = req.params;
+
+        const channel =  await User.findById(channelId);
+
+        if(!channel){
+            throw new ApiError(404,"channel doesnot exist!");
+        };
+        const subscribers =await Subscription.find({channel: channelId})
+        .populate("subscriber","username avatar")
+        .exec();
+
+        if(subscribers.length === 0 ){
+            return res.status(200).json(new ApiResponse(200,[],"no subscriber found"));
+        }
+        return res.status(200).json(new ApiResponse(200,subscribers,"subscriber found"));
+
+});
+export { toggleSubscriber, getUserChannelSubscribers };
