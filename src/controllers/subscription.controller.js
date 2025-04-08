@@ -65,4 +65,17 @@ const getUserChannelSubscribers = asyncHandler(async(req,res)=>{
         return res.status(200).json(new ApiResponse(200,subscribers,"subscriber found"));
 
 });
-export { toggleSubscriber, getUserChannelSubscribers };
+
+const getUserSubscribedChannel = asyncHandler(async(req,res)=>{
+    const {subscriberId} = req.params;
+
+   const subscriber =await Subscription.find({subscriber: subscriberId})
+      .populate("chnnel","username avatar")
+      .exec();
+
+      if(subscriber.length === 0){
+        return res.status(200).json(new ApiResponse(200, [], "No channels found for this subscriber"));
+      }
+      return res.status(200).json(new ApiResponse(200, subscriber, "Subscribed channel fetched"));
+});
+export { toggleSubscriber, getUserChannelSubscribers,getUserSubscribedChannel };
