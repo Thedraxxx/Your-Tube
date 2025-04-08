@@ -11,7 +11,7 @@ const toggleVideoLike = asyncHandler(async(req,res)=>{
          if(!videoId){
             throw ApiError(404,"Video not found.");
          }
-        const existingLike = await Like.findById({
+        const existingLike = await Like.findOne({
             videos: videoId,
             likedby: userId,
         }); 
@@ -34,7 +34,7 @@ const toggleCommentLike = asyncHandler(async(req,res)=>{
        if(!commentId){
             throw new ApiError(404,"comment is not provided")
        }
-       const existingLike = await Like.findById({
+       const existingLike = await Like.findOne({
             comment: commentId,
             likedby: userId
         })
@@ -54,7 +54,7 @@ const toggleCommentLike = asyncHandler(async(req,res)=>{
 
 const getLikedVideos = asyncHandler(async(req,res)=>{
     const userId = req.user._id;
-    const likedVideos =await Like.findById({likedby: userId})
+    const likedVideos =await Like.findOne({likedby: userId})
     .populate(
         {
             path: "videos",
