@@ -2,6 +2,7 @@ import { asyncHandler } from "../utils/asyncHandeler.js";
 import ApiError from "../utils/APIError.js";
 import ApiResponse from "../utils/APIrsponse.js";
 import Like from "../models/likes.model.js";
+import { populate } from "dotenv";
 
 const toggleVideoLike = asyncHandler(async(req,res)=>{
          const {videoId} = req.params;
@@ -52,7 +53,23 @@ const toggleCommentLike = asyncHandler(async(req,res)=>{
 });
 
 const getLikedVideos = asyncHandler(async(req,res)=>{
-
+    const userId = req.user._id;
+    const likedVideos =await Like.findById({likedby: userId})
+    .populate(
+        {
+            path: "videos",
+            select: "title description owner",
+            
+            populate: {
+                path: "owner",
+                select: "username avatar"
+            }
+            
+        }
+    )
+     return res.status(200).json(
+        new ApiResponse(200,likedVideos," sccessfully fetch the liked videos")
+     )  
 })
 
-export {toggleVideoLike, toggleCommentLike}
+export {toggleVideoLike, toggleCommentLike, getLikedVideos}
