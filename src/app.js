@@ -25,9 +25,11 @@ import userRouter from "./routes/user.routes.js";
 import videoRouter from "./routes/videos.route.js";
 import commentRouter from "./routes/comment.route.js";
 import likeRouter from "./routes/like.route.js";
+import subscriptionRouter from "./routes/subsciption.route.js";
 app.use("/api/v2/users", userRouter);           // Mount user-related routes
 app.use("/api/v2/videos",videoRouter);
 app.use("/api/v2/comments",commentRouter);
 app.use("/api/v2/likes",likeRouter);
+app.use("/api/v2/subscribers",subscriptionRouter);
 
 export default app;                             // Export app instance for use in server.js

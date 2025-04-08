@@ -30,7 +30,7 @@ const toggleVideoLike = asyncHandler(async(req,res)=>{
 const toggleCommentLike = asyncHandler(async(req,res)=>{
        const {commentId} = req.params;
        const userId = req.user._id;
-
+     
        if(!commentId){
             throw new ApiError(404,"comment is not provided")
        }
@@ -47,7 +47,7 @@ const toggleCommentLike = asyncHandler(async(req,res)=>{
                 comment: commentId,
                 likedby: userId
             });
-        return res.status(200).json( new ApiResponse(200, newLike , " liked the comment"))
+        return res.status(200).json( new ApiResponse(201, newLike , " liked the comment"))
             
         }
 });
