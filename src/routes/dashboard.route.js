@@ -5,11 +5,10 @@ import {
 
 import jwtvarify from '../middlwares/auth.middleware.js';
 
-const router = Router();
+const dashboardRouter = Router();
 
-router.use(jwtvarify); // Apply verifyJWT middleware to all routes in this file
 
-router.route("/stats").get(getChannelStats);
-router.route("/videos").get(getChannelVideos);
+dashboardRouter.route("/stats/:videoId").get(jwtvarify,getChannelStats);
+dashboardRouter.route("/videos").get(jwtvarify,getChannelVideos);
 
-export default router
+export default dashboardRouter

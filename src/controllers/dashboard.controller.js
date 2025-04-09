@@ -9,7 +9,6 @@ import ApiResponse from "../utils/APIrsponse.js";
 const getChannelStats = asyncHandler(async (req, res) => {
     const { channelId } = req.params;
   
-    // Total Videos
     const totalVideos = await Video.countDocuments({ owner: channelId });
   
     
@@ -19,10 +18,8 @@ const getChannelStats = asyncHandler(async (req, res) => {
     ]);
     const totalViews = totalViewsAgg[0]?.totalViews || 0;
   
-    // Total Likes on videos
     const totalLikes = await Like.countDocuments({ videos: { $exists: true }, likedby: { $exists: true } });
   
-    // Total Subscribers
     const totalSubscribers = await Subscription.countDocuments({ channel: channelId });
   
     res.status(200).json(
@@ -30,7 +27,7 @@ const getChannelStats = asyncHandler(async (req, res) => {
         totalVideos,
         totalViews,
         totalSubscribers,
-        totalLikes // This is total likes count (not just for the channel unless Like schema tracks video owner too)
+        totalLikes
       }, "Channel stats fetched successfully")
     );
   });

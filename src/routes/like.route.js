@@ -5,5 +5,5 @@ const likeRouter = Router();
 
 likeRouter.route("/toggle/:videoId").post(jwtvarify,toggleVideoLike);
 likeRouter.route("/toggle/comment/:commentId").post(jwtvarify,toggleCommentLike);
-likeRouter.route("/videos").get(jwtvarify, getLikedVideos)
+likeRouter.route("/videos").get(jwtvarify, getLikedVideos);
 export default likeRouter;
