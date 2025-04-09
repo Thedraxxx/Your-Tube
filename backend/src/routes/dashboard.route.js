@@ -8,7 +8,7 @@ import jwtvarify from '../middlwares/auth.middleware.js';
 const dashboardRouter = Router();
 
 
-dashboardRouter.route("/stats/:videoId").get(jwtvarify,getChannelStats);
-dashboardRouter.route("/videos").get(jwtvarify,getChannelVideos);
+dashboardRouter.route("/stats/:channelId").get(jwtvarify,getChannelStats);
+dashboardRouter.route("/videos/:channeId").get(jwtvarify,getChannelVideos);
 
 export default dashboardRouter
