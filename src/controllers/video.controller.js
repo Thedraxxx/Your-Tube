@@ -1,5 +1,5 @@
 import { asyncHandler } from "../utils/asyncHandeler.js";
-import { Video } from "../models/video.model.js";
+import  Video  from "../models/video.model.js";
 import ApiResponse from "../utils/APIrsponse.js";
 import ApiError from "../utils/APIError.js";
 import {

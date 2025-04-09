@@ -1,10 +1,10 @@
 
 import mongoose from "mongoose"
-import {Video} from "../models/video.model.js"
-import {Subscription} from "../models/subscription.model.js"
-import {Like} from "../models/like.model.js"
-import {ApiResponse} from "../utils/ApiResponse.js"
-import {asyncHandler} from "../utils/asyncHandler.js"
+import  Video  from "../models/video.model.js";
+import Like from "../models/likes.model.js";
+import Subscription from "../models/subscribtion.model.js";
+import { asyncHandler } from "../utils/asyncHandeler.js";
+import ApiResponse from "../utils/APIrsponse.js";
 
 const getChannelStats = asyncHandler(async (req, res) => {
     const { channelId } = req.params;
@@ -12,7 +12,7 @@ const getChannelStats = asyncHandler(async (req, res) => {
     // Total Videos
     const totalVideos = await Video.countDocuments({ owner: channelId });
   
-    /
+    
     const totalViewsAgg = await Video.aggregate([
       { $match: { owner: new mongoose.Types.ObjectId(channelId) } },
       { $group: { _id: null, totalViews: { $sum: "$views" } } }
