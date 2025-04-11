@@ -10,54 +10,82 @@
 
 // This function is called in the controller (userRegister.js) when the user uploads an avatar.
 
-
 import {v2 as cloudinary} from "cloudinary"
 import fs from "fs"
 
-
-cloudinary.config({ 
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME, 
-  api_key: process.env.CLOUDINARY_API_KEY, 
-  api_secret: process.env.CLOUDINARY_API_SECRET 
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
 const uploadOnCloudinary = async (localFilePath) => {
-    try {
-        if (!localFilePath) return null
-        //upload the file on cloudinary
-        const response = await cloudinary.uploader.upload(localFilePath, {
-            resource_type: "auto"
-        })
-        // file has been uploaded successfull
-        //console.log("file is uploaded on cloudinary ", response.url);
-        fs.unlinkSync(localFilePath)
-        return response;
+  try {
+    if (!localFilePath) return null
 
-    } catch (error) {
-        fs.unlinkSync(localFilePath) // remove the locally saved temporary file as the upload operation got failed
-        return null;
-    }
-}
- const deleteFromCloudinary = async (publicId, resource_type) => {
-    try {
-      const result = await cloudinary.uploader.destroy(publicId, {
-        resource_type: resource_type
-      });
-      return result;
-    } catch (error) {
-      console.error("Cloudinary deletion failed:", error);
+    // Check if file exists before attempting upload
+    if (!fs.existsSync(localFilePath)) {
+      console.log("File does not exist at path:", localFilePath);
       return null;
     }
-  };
- const getPublicIdFromUrl = (url) => {
-    const parts = url.split("/");
-    const fileWithExt = parts[parts.length - 1];
-    const folder = parts[parts.length - 2];
+
+    // Upload the file on cloudinary
+    const response = await cloudinary.uploader.upload(localFilePath, {
+      resource_type: "auto"
+    })
+    
+    // File has been uploaded successfully
+    console.log("File is uploaded on cloudinary:", response.url);
+    
+    // Safely delete the local file
+    try {
+      if (fs.existsSync(localFilePath)) {
+        fs.unlinkSync(localFilePath);
+      }
+    } catch (deleteError) {
+      console.error("Error deleting local file:", deleteError);
+      // Continue execution despite file deletion error
+    }
+    
+    return response;
+    
+  } catch (error) {
+    console.error("Error uploading to Cloudinary:", error);
+    
+    // Safely delete the local file if it exists
+    try {
+      if (fs.existsSync(localFilePath)) {
+        fs.unlinkSync(localFilePath);
+      }
+    } catch (deleteError) {
+      console.error("Error deleting local file after failed upload:", deleteError);
+    }
+    
+    return null;
+  }
+}
+
+const deleteFromCloudinary = async (publicId, resource_type) => {
+  try {
+    const result = await cloudinary.uploader.destroy(publicId, {
+      resource_type: resource_type
+    });
+    return result;
+  } catch (error) {
+    console.error("Cloudinary deletion failed:", error);
+    return null;
+  }
+};
+
+const getPublicIdFromUrl = (url) => {
+  const parts = url.split("/");
+  const fileWithExt = parts[parts.length - 1];
+  const folder = parts[parts.length - 2];
   
-    const publicId = `${folder}/${fileWithExt.split(".")[0]}`;
-    return publicId;
-  };
-  
+  const publicId = `${folder}/${fileWithExt.split(".")[0]}`;
+  return publicId;
+};
+
 // Export the configured Cloudinary instance
 export {uploadOnCloudinary, deleteFromCloudinary, getPublicIdFromUrl}
 
