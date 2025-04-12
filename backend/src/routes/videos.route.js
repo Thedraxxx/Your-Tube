@@ -1,10 +1,11 @@
 import { Router } from "express";
-import { uploadVideo, fetchVideo, deleteVideo } from "../controllers/video.controller.js";
+import { uploadVideo, fetchVideo, deleteVideo, getVideoById } from "../controllers/video.controller.js";
 import jwtvarify from "../middlwares/auth.middleware.js";
 import upload from "../middlwares/multer.middleware.js";
 const videoRouter = Router();
+videoRouter.route("/single/:videoid").get(getVideoById)
 videoRouter.route("/")
-  .get(jwtvarify, fetchVideo)
+  .get(fetchVideo)
   .post(jwtvarify, upload.fields([
     { name: "videos", maxCount: 1 },
     { name: "thumbnail", maxCount: 1 }

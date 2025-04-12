@@ -23,14 +23,14 @@ const fetchVideo = asyncHandler(async (req, res) => {
   const matchStage = {
     isPublished: true,
   };
-  console.log(matchStage);
+
   if (query) {
     matchStage.$or = [
       { title: { $regex: query, $options: "i" } },
       { description: { $regex: query, $options: "i" } },
     ];
   }
-  console.log(query);
+
   if (owner) {
     matchStage.owner = owner;
   }
@@ -42,17 +42,79 @@ const fetchVideo = asyncHandler(async (req, res) => {
         [sortBy]: sortType === "asc" ? 1 : -1,
       },
     },
+    {
+      $lookup: {
+        from: "users", // 👈 collection name of users
+        localField: "owner",
+        foreignField: "_id",
+        as: "owner",
+      },
+    },
+    {
+      $unwind: {
+        path: "$owner",
+        preserveNullAndEmptyArrays: true, // Just in case the owner is missing
+      },
+    },
+    {
+      $project: {
+        title: 1,
+        thumbnail: 1,
+        duration: 1,
+        views: 1,
+        createdAt: 1,
+        owner: {
+          _id: 1,
+          fullname: 1,
+          username: 1,
+        },
+      },
+    },
   ]);
+
   const options = {
     page: parseInt(page),
     limit: parseInt(limit),
   };
 
   const result = await Video.aggregatePaginate(aggrigatQuery, options);
+
   return res
     .status(200)
-    .json(new ApiResponse(200, result, "videos fetchd successfully."));
+    .json(new ApiResponse(200, result, "videos fetched successfully."));
 });
+const getVideoById = asyncHandler(async (req, res) => {
+  console.log(req.params)
+  const  {videoid}  = req.params;
+  console.log(videoid)
+  // Check if videoid is valid
+  if (!videoid) {
+    return res
+      .status(400)
+      .json(new ApiResponse(400, null, "Video ID is required."));
+  }
+
+  // Fetch video by ID and populate owner details if needed
+  const video = await Video.findById(videoid).populate("owner", "username avatar");
+
+  if (!video) {
+    return res
+      .status(404)
+      .json(new ApiResponse(404, null, "Video not found."));
+  }
+
+  // Optional: Restrict access to unpublished videos unless owner is viewing
+  if (!video.isPublished) {
+    return res
+      .status(403)
+      .json(new ApiResponse(403, null, "This video is not published."));
+  }
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, video, "Video fetched successfully."));
+});
+
 /*
    publish video 
 */
@@ -95,10 +157,10 @@ const uploadVideo = asyncHandler(async (req, res) => {
   delete selected video
 */
 const deleteVideo = asyncHandler(async (req, res) => {
-  const videoId = req.params?.id.trim();
+  const videoid = req.params?.id.trim();
   const userId = req.user?._id;
-  console.log(videoId);
-  const video = await Video.findById(videoId);
+  console.log(videoid);
+  const video = await Video.findById(videoid);
   if (!video) {
     throw new ApiError(404, "video not found.");
   }
@@ -122,9 +184,9 @@ const deleteVideo = asyncHandler(async (req, res) => {
 */
 const editVideo = asyncHandler(async (req, res) => {
   const { title, description } = req.body;
-  const { videoId } = req.params;
+  const { videoid } = req.params;
 
-  const video = await Video.findById(videoId);
+  const video = await Video.findById(videoid);
 
   if (!video) {
     return res.status(404).json(
@@ -149,4 +211,4 @@ const editVideo = asyncHandler(async (req, res) => {
   );
 });
 
-export { fetchVideo, uploadVideo, deleteVideo, editVideo };
+export { fetchVideo, uploadVideo, deleteVideo, editVideo,getVideoById };
