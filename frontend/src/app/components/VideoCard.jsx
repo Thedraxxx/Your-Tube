@@ -45,7 +45,7 @@ export default function VideoCard({ video }) {
 
   return (
     <div className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300">
-      <Link href={`arc/app/api/video/${_id}`}>
+      <Link href={`/video/${_id}`}>
         <div className="relative">
           {/* Thumbnail */}
           <div className="aspect-video relative bg-gray-200">

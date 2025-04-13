@@ -27,11 +27,13 @@ import commentRouter from "./routes/comment.route.js";
 import likeRouter from "./routes/like.route.js";
 import subscriptionRouter from "./routes/subsciption.route.js";
 import dashboardRouter from "./routes/dashboard.route.js";
+import authRouter from "./routes/auth.route.js";
 app.use("/api/v2/users", userRouter);           // Mount user-related routes
 app.use("/api/v2/videos",videoRouter);
 app.use("/api/v2/comments",commentRouter);
 app.use("/api/v2/likes",likeRouter);
 app.use("/api/v2/subscribers",subscriptionRouter);
 app.use("/api/v2/dashboard",dashboardRouter);
+app.use("/api/v2/auths",authRouter);
 
 export default app;                             // Export app instance for use in server.js
