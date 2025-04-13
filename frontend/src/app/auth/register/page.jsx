@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { use, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/app/context/authcontext';
 export default function Register() {
   const [form, setForm] = useState({
     username: '',
@@ -13,7 +14,7 @@ export default function Register() {
     coverImage: null,
   });
   const router = useRouter();
-
+  const { setIsAuthenticated } = useAuth(); 
   const [error, setError] = useState('');
 
   const handleChange = (e) => {
@@ -55,6 +56,7 @@ export default function Register() {
 
       console.log('User registered:', data);
       alert("user registerd successfully")
+      setIsAuthenticated(true); 
       router.push("/");
     } catch (err) {
       setError(err.message);

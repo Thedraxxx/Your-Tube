@@ -1,5 +1,5 @@
 import { asyncHandler } from "../utils/asyncHandeler.js";
-import  Video  from "../models/video.model.js";
+import Video from "../models/video.model.js";
 import ApiResponse from "../utils/APIrsponse.js";
 import ApiError from "../utils/APIError.js";
 import {
@@ -84,9 +84,9 @@ const fetchVideo = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, result, "videos fetched successfully."));
 });
 const getVideoById = asyncHandler(async (req, res) => {
-  console.log(req.params)
-  const  {videoid}  = req.params;
-  console.log(videoid)
+  console.log(req.params);
+  const { videoid } = req.params;
+  console.log(videoid);
   // Check if videoid is valid
   if (!videoid) {
     return res
@@ -95,12 +95,13 @@ const getVideoById = asyncHandler(async (req, res) => {
   }
 
   // Fetch video by ID and populate owner details if needed
-  const video = await Video.findById(videoid).populate("owner", "username avatar");
+  const video = await Video.findById(videoid).populate(
+    "owner",
+    "username avatar"
+  );
 
   if (!video) {
-    return res
-      .status(404)
-      .json(new ApiResponse(404, null, "Video not found."));
+    return res.status(404).json(new ApiResponse(404, null, "Video not found."));
   }
 
   // Optional: Restrict access to unpublished videos unless owner is viewing
@@ -164,8 +165,8 @@ const deleteVideo = asyncHandler(async (req, res) => {
   if (!video) {
     throw new ApiError(404, "video not found.");
   }
-  console.log(video)
-  console.log(video.owner)
+  console.log(video);
+  console.log(video.owner);
   if (video.owner !== userId) {
     throw new ApiError(403, "you are not authorized to delete this video.");
   }
@@ -189,26 +190,38 @@ const editVideo = asyncHandler(async (req, res) => {
   const video = await Video.findById(videoid);
 
   if (!video) {
-    return res.status(404).json(
-      new ApiResponse(404, null, "Video not found")
-    );
+    return res.status(404).json(new ApiResponse(404, null, "Video not found"));
   }
 
   if (video.owner.toString() !== req.user._id.toString()) {
-    return res.status(403).json(
-      new ApiResponse(403, null, "Not authorized to edit this video")
-    );
+    return res
+      .status(403)
+      .json(new ApiResponse(403, null, "Not authorized to edit this video"));
   }
 
   video.title = title || video.title;
   video.description = description || video.description;
 
-
   const updatedVideo = await video.save();
 
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(200, updatedVideo, "Video details edited successfully")
+    );
+});
+const fetchUserVideos = asyncHandler(async (req, res) => {
+  const userId = req.user._id;
+  const videos = await Video.find({
+    owner: userId,
+  }).sort({createdAt: -1});
+
+  if(!videos){
+    throw new ApiError(404,"no vidoes found")
+  }
   return res.status(200).json(
-    new ApiResponse(200, updatedVideo, "Video details edited successfully")
-  );
+    new ApiResponse(200,videos,"fetched video scussfully")
+  )
 });
 
-export { fetchVideo, uploadVideo, deleteVideo, editVideo,getVideoById };
+export { fetchVideo, uploadVideo, deleteVideo, editVideo, getVideoById , fetchUserVideos};

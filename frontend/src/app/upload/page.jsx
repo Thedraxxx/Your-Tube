@@ -23,7 +23,7 @@ export default function UploadPage() {
     // If auth check is completed (via context) and user is not authenticated
     if (!isAuthenticated) {
       console.log("Not authenticated, redirecting to login");
-      router.push('/auth/login'); // Make sure this is the correct path
+      router.push('/auth/login'); 
     }
     setIsLoading(false);
   }, [isAuthenticated, router]);

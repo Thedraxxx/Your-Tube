@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Search, Upload, LogIn, LogOut } from 'lucide-react';
+import { Search, Upload, LogIn, LogOut, UserCircle } from 'lucide-react';
 import { useAuth } from '../context/authcontext';
 
 const Navbar = () => {
@@ -83,6 +83,9 @@ const Navbar = () => {
                   <LogOut className="mr-1" size={20} />
                   <span className="hidden md:inline">Logout</span>
                 </button>
+                <Link href= "/auth/profile" className="text-zinc-300 hover:text-red-500 flex items-center">
+                              <UserCircle  className="mr-1" size={20} />
+                </Link>
               </>
             ) : (
               <Link href="/auth/login" className="text-zinc-300 hover:text-red-500 flex items-center">

@@ -4,6 +4,7 @@ import {
   fetchVideo,
   deleteVideo,
   getVideoById,
+  fetchUserVideos
 } from "../controllers/video.controller.js";
 import jwtvarify from "../middlwares/auth.middleware.js";
 import upload from "../middlwares/multer.middleware.js";
@@ -20,5 +21,6 @@ videoRouter.route("/publish").post(
 );
 
 videoRouter.route("/:id").delete(jwtvarify, deleteVideo);
+videoRouter.route("/userVideos").get(jwtvarify,fetchUserVideos);
 
 export default videoRouter;
