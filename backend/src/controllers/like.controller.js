@@ -4,6 +4,29 @@ import ApiResponse from "../utils/APIrsponse.js";
 import Like from "../models/likes.model.js";
 import { populate } from "dotenv";
 
+const videoLikeStatus = asyncHandler(async (req, res) => {
+    const { videoId } = req.params;
+    const userId = req.user._id;
+  
+    if (!videoId) {
+      throw new ApiError(400, "Video ID is required.");
+    }
+  
+    const existingLike = await Like.findOne({
+      videos: videoId,
+      likedby: userId,
+    });
+  
+    return res.status(200).json(
+      new ApiResponse(
+        200,
+        { isLiked: !!existingLike }, // Boolean result
+        "Like status fetched successfully."
+      )
+    );
+  });
+  
+
 const toggleVideoLike = asyncHandler(async(req,res)=>{
          const {videoId} = req.params;
          const userId = req.user._id; // kasla like garako...
@@ -72,4 +95,4 @@ const getLikedVideos = asyncHandler(async(req,res)=>{
      )  
 })
 
-export {toggleVideoLike, toggleCommentLike, getLikedVideos}
+export {toggleVideoLike, toggleCommentLike, getLikedVideos, videoLikeStatus}

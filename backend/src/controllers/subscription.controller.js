@@ -5,44 +5,60 @@ import Subscription from "../models/subscribtion.model.js";
 import User from "../models/user.model.js";
 const toggleSubscriber = asyncHandler(async (req, res) => {
   const userId = req.user._id;
-  // console.log(userId);
   const { channelId } = req.params;
 
-  console.log(channelId);
   if (channelId.toString() === userId.toString()) {
-    throw new ApiError(401, "cant subsribe to your own channel.");
+    throw new ApiError(401, "Can't subscribe to your own channel.");
   }
-  const databaseChanenlId = await User.findOne({
-    _id: channelId,
-  }).select("_id");
-  console.log(databaseChanenlId._id.toString());
-//   console.log(databaseChanenlId);
-  if (databaseChanenlId._id.toString() !== channelId) {
+
+  const databaseChannel = await User.findOne({ _id: channelId }).select("_id");
+
+  if (!databaseChannel || databaseChannel._id.toString() !== channelId) {
     throw new ApiError(404, "Channel does not exist");
   }
-  const channelSubscribe = await Subscription.findOne({
+
+  const existingSubscription = await Subscription.findOne({
     subscriber: userId,
     channel: channelId,
   });
-//   console.log(channelSubscribe);
-  if (channelSubscribe) {
-    await channelSubscribe.deleteOne();
-    return res
-      .status(200)
-      .json(
-        new ApiResponse(200, null, "unsubscribe to this channel sccussfully")
-      );
+
+  if (existingSubscription) {
+    await existingSubscription.deleteOne();
+    console.log("usnsubscribe")
+    return res.status(200).json(
+      new ApiResponse(200, { isSubscribed: false }, "Unsubscribed successfully")
+    );
   } else {
-    const channelSubscribe = await Subscription.create({
+    await Subscription.create({
       subscriber: userId,
       channel: channelId,
     });
+     console.log("subscribe")
+    return res.status(200).json(
+      new ApiResponse(201, { isSubscribed: true }, "Subscribed successfully")
+    );
+  }
+});
+const checkSubscriptionStatus = asyncHandler(async (req, res) => {
+  const userId = req.user._id;
+  const { channelId } = req.params;
+
+  if (userId.toString() === channelId.toString()) {
     return res
       .status(200)
-      .json(
-        new ApiResponse(201, channelSubscribe, "channel subscribe scussfully")
-      );
+      .json(new ApiResponse(200, { isSubscribed: false }, "Cannot subscribe to your own channel."));
   }
+
+  const subscription = await Subscription.findOne({
+    subscriber: userId,
+    channel: channelId,
+  });
+
+  const isSubscribed = !!subscription;
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, { isSubscribed }, "Subscription status fetched successfully"));
 });
 
 const getUserChannelSubscribers = asyncHandler(async(req,res)=>{
@@ -78,4 +94,4 @@ const getUserSubscribedChannel = asyncHandler(async(req,res)=>{
       }
       return res.status(200).json(new ApiResponse(200, subscriber, "Subscribed channel fetched"));
 });
-export { toggleSubscriber, getUserChannelSubscribers,getUserSubscribedChannel };
+export { toggleSubscriber, getUserChannelSubscribers,getUserSubscribedChannel, checkSubscriptionStatus };
