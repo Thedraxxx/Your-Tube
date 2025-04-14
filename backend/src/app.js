@@ -4,12 +4,23 @@ import cookieParser from "cookie-parser";       // Parses cookies from requests
 
 const app = express();                          // Create an Express application
 
-// CORS Middleware – allows requests from specific origin
-app.use(cors({
-    origin: process.env.CORS_ORIGIN,           // Set allowed origin from environment variable
-    credentials: true                          // Allow cookies to be sent from frontend
-}));
-
+const allowedOrigins = process.env.CORS_ORIGIN?.split(",") || [
+    "http://localhost:3000"
+  ];
+  
+  
+  app.use(cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true
+  }));
+  
+  
 // Body Parsers
 app.use(express.json({ limit: "20kb" }));       // Parse JSON requests (limit: 20kb)
 app.use(express.urlencoded({ extended: true, limit: "16kb" })); // Parse URL-encoded data
