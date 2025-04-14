@@ -186,13 +186,17 @@ const deleteVideo = asyncHandler(async (req, res) => {
 */
 const editVideo = asyncHandler(async (req, res) => {
   const { title, description } = req.body;
-  const { videoid } = req.params;
+  console.log('req body :',req.body)
+  console.log(req.params)
+  const { videoId } = req.params;
 
-  const video = await Video.findById(videoid);
+  const video = await Video.findById(videoId);
 
   if (!video) {
     return res.status(404).json(new ApiResponse(404, null, "Video not found"));
   }
+  console.log("video owner:",video.owner)
+  console.log("req user: ", req.user._id)
 
   if (video.owner.toString() !== req.user._id.toString()) {
     return res

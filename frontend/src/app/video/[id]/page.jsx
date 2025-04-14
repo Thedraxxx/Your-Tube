@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { formatDistanceToNow } from "date-fns";
 import axios from "axios";
 import { useAuth } from "@/app/context/authcontext";
+import CommentSection from "@/app/components/comment";
 
 // fetch video by id
 async function getVideo(id) {
@@ -170,6 +171,7 @@ export default function VideoPage({ params }) {
       <p className="text-gray-700 mt-2 whitespace-pre-line">
         {video.description}
       </p>
+      <CommentSection videoId={video._id} />
     </div>
   );
 }

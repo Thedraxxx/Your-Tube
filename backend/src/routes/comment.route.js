@@ -8,5 +8,5 @@ const commentRouter = Router();
 commentRouter.route("/:videoId").post(jwtvarify,publishComment);
 commentRouter.route("/edit/:commentId").patch(jwtvarify,editComment);
 commentRouter.route("/:commentId").delete(jwtvarify,deleteComment);
-commentRouter.route("/:videoId").get(jwtvarify,getVideoComment)
+commentRouter.route("/:videoId").get(getVideoComment)
 export default commentRouter;

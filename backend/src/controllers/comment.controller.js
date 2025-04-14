@@ -10,9 +10,9 @@ const publishComment = asyncHandler(async (req, res) => {
   const { content } = req.body;
   const { videoId } = req.params;
   const userId = req.user._id;
-  //  console.log(req.body);
-  //  console.log(videoId);
-  //  console.log(userId);
+   console.log(req.body);
+   console.log(videoId);
+   console.log(userId);
 
   if (!content) {
     throw new ApiError(400, "enpty content");

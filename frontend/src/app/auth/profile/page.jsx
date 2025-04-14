@@ -179,7 +179,7 @@ export default function ProfileSummary() {
                 {/* Buttons (Edit/Delete) */}
                 <div className="absolute top-2 right-2 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition">
                   <button
-                    onClick={() => router.push(`/edit-video/${video._id}`)}
+                    onClick={() => router.push(`/video/edit-video/${video._id}`)}
                     className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 text-sm rounded"
                   >
                     Edit
