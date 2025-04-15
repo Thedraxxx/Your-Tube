@@ -1,24 +1,13 @@
-'use client'
-import { useEffect, useState } from 'react';
+'use client';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Search, Upload, LogIn, LogOut, UserCircle } from 'lucide-react';
+import { Upload, LogIn, LogOut, UserCircle } from 'lucide-react';
 import { useAuth } from '../context/authcontext';
 
 const Navbar = () => {
-  const { isAuthenticated, setIsAuthenticated } = useAuth(); // Use auth from context
-  const [searchQuery, setSearchQuery] = useState('');
+  const { isAuthenticated, setIsAuthenticated } = useAuth();
   const router = useRouter();
 
-  // handleSearch function remains the same
-  const handleSearch = (e) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
-    }
-  };
-
-  // handleLogout function remains the same
   const handleLogout = async () => {
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v2/users/logout`, {
@@ -39,58 +28,37 @@ const Navbar = () => {
   return (
     <nav className="bg-zinc-900 shadow-md sticky top-0 z-10 text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
+        <div className="flex justify-between h-16 items-center">
+          
           {/* Logo */}
-          <div className="flex items-center">
-            <Link href="/" className="flex-shrink-0 flex items-center">
-              <span className="text-red-500 font-bold text-xl">YourTube</span>
-            </Link>
-          </div>
+          <Link href="/" className="flex items-center space-x-2">
+            <span className="text-red-500 font-extrabold text-2xl">YourTube</span>
+          </Link>
 
-          {/* Search */}
-          <div className="flex-1 flex items-center justify-center px-2 lg:ml-6 lg:mr-6">
-            <form onSubmit={handleSearch} className="w-full max-w-lg">
-              <div className="relative flex items-center">
-                <input
-                  type="text"
-                  placeholder="Search videos..."
-                  className="w-full h-10 pl-4 pr-10 rounded-full bg-zinc-800 border border-zinc-700 text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-red-500"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-                <button
-                  type="submit"
-                  className="absolute right-0 top-0 h-10 w-10 text-zinc-400 hover:text-white flex items-center justify-center"
-                >
-                  <Search size={20} />
-                </button>
-              </div>
-            </form>
-          </div>
-
-          {/* Auth Buttons */}
-          <div className="flex items-center space-x-4">
+          {/* Right Side Actions */}
+          <div className="flex items-center space-x-3">
             {isAuthenticated ? (
               <>
-                <Link href="/upload" className="text-zinc-300 hover:text-red-500 flex items-center">
-                  <Upload className="mr-1" size={20} />
-                  <span className="hidden md:inline">Upload</span>
+                <Link href="/upload" className="p-2 rounded-full hover:bg-zinc-800 transition">
+                  <Upload size={22} />
+                </Link>
+                <Link href="/auth/profile" className="p-2 rounded-full hover:bg-zinc-800 transition">
+                  <UserCircle size={24} />
                 </Link>
                 <button
                   onClick={handleLogout}
-                  className="text-zinc-300 hover:text-red-500 flex items-center"
+                  className="p-2 rounded-full hover:bg-zinc-800 transition"
                 >
-                  <LogOut className="mr-1" size={20} />
-                  <span className="hidden md:inline">Logout</span>
+                  <LogOut size={22} />
                 </button>
-                <Link href= "/auth/profile" className="text-zinc-300 hover:text-red-500 flex items-center">
-                              <UserCircle  className="mr-1" size={20} />
-                </Link>
               </>
             ) : (
-              <Link href="/auth/login" className="text-zinc-300 hover:text-red-500 flex items-center">
-                <LogIn className="mr-1" size={20} />
-                <span>Sign In</span>
+              <Link
+                href="/auth/login"
+                className="flex items-center px-3 py-1.5 border border-red-500 text-red-500 hover:bg-red-500 hover:text-white rounded-full transition"
+              >
+                <LogIn size={18} className="mr-1" />
+                <span className="text-sm font-medium">Sign In</span>
               </Link>
             )}
           </div>
