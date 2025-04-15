@@ -10,9 +10,9 @@ const publishComment = asyncHandler(async (req, res) => {
   const { content } = req.body;
   const { videoId } = req.params;
   const userId = req.user._id;
-   console.log(req.body);
-   console.log(videoId);
-   console.log(userId);
+  //  console.log(req.body);
+  //  console.log(videoId);
+  //  console.log(userId);
 
   if (!content) {
     throw new ApiError(400, "enpty content");
@@ -67,7 +67,7 @@ const getVideoComment = asyncHandler(async (req, res) => {
   const { videoId } = req.params;
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 10;
-  console.log(videoId);
+  // console.log(videoId);
   const comments = await Comment.aggregate([
     { $match: { videos: new mongoose.Types.ObjectId(videoId) } },
     { $sort: { createdAt: -1 } },

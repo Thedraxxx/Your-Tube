@@ -26,7 +26,7 @@ const userRegister = asyncHandler(async (req, res) => {
   const { username, email, password, fullname } = req.body;
 
   if (!username || !email || !password || !fullname) {
-    console.error("Missing Fields Detected");
+    // console.error("Missing Fields Detected");
     throw new ApiError(400, "All fields are required");
   }
 
@@ -42,7 +42,7 @@ const userRegister = asyncHandler(async (req, res) => {
     if (existingUser) {
       const conflictField =
         existingUser.username === usernameTrimmed ? "username" : "email";
-      console.warn(`Duplicate ${conflictField} Detected`);
+      // console.warn(`Duplicate ${conflictField} Detected`);
       throw new ApiError(409, `User with this ${conflictField} already exists`);
     }
 
@@ -54,7 +54,7 @@ const userRegister = asyncHandler(async (req, res) => {
     }
 
     const avatar = await uploadOnCloudinary(avatarLocalPath);
-    console.log("Cloudinary Avatar Upload:", avatar ? "Success" : "Failed");
+    // console.log("Cloudinary Avatar Upload:", avatar ? "Success" : "Failed");
 
     if (!avatar) {
       throw new ApiError(400, "Avatar upload failed");
@@ -78,7 +78,7 @@ const userRegister = asyncHandler(async (req, res) => {
       username: usernameTrimmed,
     });
 
-    console.log("User Created Successfully!");
+    // console.log("User Created Successfully!");
 
     // Fetch created user without sensitive information
     const createdUser = await User.findById(user._id).select(
@@ -92,7 +92,7 @@ const userRegister = asyncHandler(async (req, res) => {
     // Handle specific MongoDB duplicate key error
     if (error.code === 11000) {
       const duplicateField = Object.keys(error.keyPattern)[0];
-      console.warn(`Duplicate Key Error: ${duplicateField}`);
+      // console.warn(`Duplicate Key Error: ${duplicateField}`);
       throw new ApiError(409, `${duplicateField} already exists`);
     }
     throw error;
@@ -141,7 +141,7 @@ const userLogin = asyncHandler(async (req, res) => {
     .json(
       new ApiResponse(
         200,
-        { user: loggedInUser, accessToken, refreshToken },
+        { user: loggedInUser, accessToken },
         "User logged in successully"
       )
     );
@@ -272,7 +272,7 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
    update avatar
 */
 const updateAvatar = asyncHandler(async (req, res) => {
-  console.log("req body: ", req.body);
+  // console.log("req body: ", req.body);
   // console.log(req.file);
   const avatarLocalPath = req.file?.path;
   // console.log("avatarPath", avatarLocalPath);
@@ -322,7 +322,7 @@ const updateAvatar = asyncHandler(async (req, res) => {
 */
 const updateCoverImage = asyncHandler(async (req, res) => {
   const coverImageLocalPath = req.file?.path;
-  console.log(req.file?.path);
+  // console.log(req.file?.path);
 
   if (!coverImageLocalPath) {
     throw new ApiError(401, "invalid image path");

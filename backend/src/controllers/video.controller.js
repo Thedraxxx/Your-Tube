@@ -84,9 +84,9 @@ const fetchVideo = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, result, "videos fetched successfully."));
 });
 const getVideoById = asyncHandler(async (req, res) => {
-  console.log(req.params);
+  // console.log(req.params);
   const { videoid } = req.params;
-  console.log(videoid);
+  // console.log(videoid);
   // Check if videoid is valid
   if (!videoid) {
     return res
@@ -121,7 +121,7 @@ const getVideoById = asyncHandler(async (req, res) => {
 */
 const uploadVideo = asyncHandler(async (req, res) => {
   const { title, description } = req.body;
-  console.log(req.body);
+  // console.log(req.body);
   if (!title.trim() || !description.trim()) {
     throw new ApiError(400, "this feild are required");
   }
@@ -129,8 +129,8 @@ const uploadVideo = asyncHandler(async (req, res) => {
   console.log(req.files);
   const videoLocalPath = req.files?.videos?.[0]?.path;
   const thumbnailLocalpath = req.files?.thumbnail?.[0]?.path;
-  console.log("video: ", videoLocalPath);
-  console.log("thumbnail: ", thumbnailLocalpath);
+  // console.log("video: ", videoLocalPath);
+  // console.log("thumbnail: ", thumbnailLocalpath);
   if (!videoLocalPath || !thumbnailLocalpath) {
     throw new ApiError(400, "no files uploaded");
   }
@@ -166,8 +166,8 @@ const deleteVideo = asyncHandler(async (req, res) => {
     throw new ApiError(404, "video not found.");
   }
   // console.log('user videos:',video);
-  console.log('user:',video.owner);
-  console.log('userid :', userId);
+  // console.log('user:',video.owner);
+  // console.log('userid :', userId);
   if (!video.owner.equals(userId)) {
     throw new ApiError(403, "you are not authorized to delete this video.");
   }
@@ -186,8 +186,8 @@ const deleteVideo = asyncHandler(async (req, res) => {
 */
 const editVideo = asyncHandler(async (req, res) => {
   const { title, description } = req.body;
-  console.log('req body :',req.body)
-  console.log(req.params)
+  // console.log('req body :',req.body)
+  // console.log(req.params)
   const { videoId } = req.params;
 
   const video = await Video.findById(videoId);
@@ -195,8 +195,8 @@ const editVideo = asyncHandler(async (req, res) => {
   if (!video) {
     return res.status(404).json(new ApiResponse(404, null, "Video not found"));
   }
-  console.log("video owner:",video.owner)
-  console.log("req user: ", req.user._id)
+  // console.log("video owner:",video.owner)
+  // console.log("req user: ", req.user._id)
 
   if (video.owner.toString() !== req.user._id.toString()) {
     return res
