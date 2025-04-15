@@ -29,7 +29,7 @@ export default function editVideo () {
     e.preventDefault();
     setIsLoading(true)
              try {
-               const res =  await axios.patch(`http://localhost:8000/api/v2/videos/editVideo/${id}`,{
+               const res =  await axios.patch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v2/videos/editVideo/${id}`,{
                 title,description,
                },{
                 withCredentials: true,

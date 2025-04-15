@@ -19,7 +19,7 @@ export default function ProfileSummary() {
     const fetchUser = async () => {
       try {
         const res = await fetch(
-          "http://localhost:8000/api/v2/users/current-user",
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v2/users/current-user`,
           {
             credentials: "include",
           }
@@ -47,7 +47,7 @@ export default function ProfileSummary() {
     const fetchVideos = async () => {
       try {
         const res = await fetch(
-          "http://localhost:8000/api/v2/videos/userVideos",
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v2/videos/userVideos`,
           {
             credentials: "include",
           }
@@ -79,7 +79,7 @@ export default function ProfileSummary() {
     if (!confirmDelete) return;
   
     try {
-      const res = await fetch(`http://localhost:8000/api/v2/videos/${id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v2/videos/${id}`, {
         method: "DELETE",
         credentials: "include",
       });

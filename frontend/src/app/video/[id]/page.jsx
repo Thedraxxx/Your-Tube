@@ -10,7 +10,7 @@ import CommentSection from "@/app/components/comment";
 async function getVideo(id) {
   try {
     const res = await axios.get(
-      `http://localhost:8000/api/v2/videos/single/${id}`
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v2/videos/single/${id}`
     );
     return res.data?.data;
   } catch (error) {
@@ -23,7 +23,7 @@ async function getVideo(id) {
 async function getSubscriptionStatus(channelId) {
   try {
     const res = await axios.get(
-      `http://localhost:8000/api/v2/subscribers/status/${channelId}`,
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v2/subscribers/status/${channelId}`,
       { withCredentials: true }
     );
     return res.data?.data?.isSubscribed || false;
@@ -37,7 +37,7 @@ async function getSubscriptionStatus(channelId) {
 async function getLikeStatus(videoId) {
   try {
     const res = await axios.get(
-      `http://localhost:8000/api/v2/likes/status/${videoId}`,
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v2/likes/status/${videoId}`,
       { withCredentials: true }
     );
     return res.data?.data?.isLiked || false;
@@ -78,7 +78,7 @@ export default function VideoPage({ params }) {
 
     try {
       const res = await axios.post(
-        `http://localhost:8000/api/v2/subscribers/subscribe/${video.owner._id}`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v2/subscribers/subscribe/${video.owner._id}`,
         {},
         { withCredentials: true }
       );
@@ -96,7 +96,7 @@ export default function VideoPage({ params }) {
 
     try {
       await axios.post(
-        `http://localhost:8000/api/v2/likes/toggle/${id}`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v2/likes/toggle/${id}`,
         {},
         { withCredentials: true }
       );

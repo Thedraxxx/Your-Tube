@@ -20,7 +20,7 @@ export default function Login() {
     formData.append("password", password);
 
     try {
-      const response = await fetch("http://localhost:8000/api/v2/users/login", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v2/users/login`, {
         method: "POST",
         body: formData,
         credentials: "include",  // This ensures cookies are sent with requests

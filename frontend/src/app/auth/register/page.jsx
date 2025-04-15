@@ -43,7 +43,7 @@ export default function Register() {
     if (form.coverImage) formData.append('coverImage', form.coverImage);
 
     try {
-      const res = await fetch('http://localhost:8000/api/v2/users/register', {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v2/users/register`, {
         method: 'POST',
         body: formData,
       });

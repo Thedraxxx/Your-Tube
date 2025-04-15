@@ -22,7 +22,7 @@ export default function CommentSection({ videoId }) {
     
     const fetchComments = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/api/v2/comments/${videoId}?page=${page}&limit=10`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v2/comments/${videoId}?page=${page}&limit=10`, {
           credentials: 'include'
         });
         
@@ -66,7 +66,7 @@ export default function CommentSection({ videoId }) {
     setError('');
     
     try {
-      const response = await fetch(`http://localhost:8000/api/v2/comments/${videoId}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v2/comments/${videoId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -87,7 +87,7 @@ export default function CommentSection({ videoId }) {
       
       // Refresh comments by resetting page to 1
       setPage(1);
-      const refreshResponse = await fetch(`http://localhost:8000/api/v2/comments/${videoId}?page=1&limit=10`, {
+      const refreshResponse = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v2/comments/${videoId}?page=1&limit=10`, {
         credentials: 'include'
       });
       

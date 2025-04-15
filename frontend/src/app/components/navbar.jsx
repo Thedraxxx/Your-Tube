@@ -21,7 +21,7 @@ const Navbar = () => {
   // handleLogout function remains the same
   const handleLogout = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/v2/users/logout', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v2/users/logout`, {
         method: 'POST',
         credentials: 'include',
       });

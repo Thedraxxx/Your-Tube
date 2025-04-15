@@ -35,7 +35,7 @@ export default function HomeContent() {
         params.append("sortType", "desc");
 
         const response = await axios.get(
-          `https://youtube-clone-4fmc.onrender.com/api/v2/videos?${params.toString()}`
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v2/videos?${params.toString()}`
         );
 
         if (response.data && response.data.data) {

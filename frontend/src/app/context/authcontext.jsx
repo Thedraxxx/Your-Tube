@@ -12,7 +12,7 @@ export const AuthProvider = ({ children }) => {
     const checkAuth = async () => {
       setIsLoading(true);
       try {
-        const res = await fetch('http://localhost:8000/api/v2/auths/check-auth', {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v2/auths/check-auth`, {
           credentials: 'include'
         });
         if (res.ok) {

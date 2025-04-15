@@ -75,7 +75,7 @@ export default function UploadPage() {
         });
       }, 500);
 
-      const response = await fetch('http://localhost:8000/api/v2/videos/publish', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v2/videos/publish`, {
         method: 'POST',
         body: formData,
         credentials: 'include',
