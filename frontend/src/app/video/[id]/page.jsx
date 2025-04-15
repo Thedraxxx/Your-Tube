@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/context/authcontext";
 import CommentSection from "@/app/components/comment";
 import ensureHttps from "@/app/utils/httpSolution";
-import { useRouter } from "next/router";
+
 
 // fetch video by id
 async function getVideo(id) {
