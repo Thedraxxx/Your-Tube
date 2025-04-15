@@ -155,17 +155,18 @@ export default function HomeContent() {
           </div>
           
           <div className="flex gap-2">
-            <select 
-              value={`${sortOptions.sortBy}-${sortOptions.sortType}`}
-              onChange={handleSortChange}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="createdAt-desc">Newest</option>
-              <option value="createdAt-asc">Oldest</option>
-              <option value="views-desc">Most Viewed</option>
-              <option value="title-asc">Title A-Z</option>
-              <option value="title-desc">Title Z-A</option>
-            </select>
+          <select
+  value={`${sortOptions.sortBy}-${sortOptions.sortType}`}
+  onChange={handleSortChange}
+  className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-800 text-white"
+>
+  <option className="bg-gray-800 text-white" value="createdAt-desc">Newest</option>
+  <option className="bg-gray-800 text-white" value="createdAt-asc">Oldest</option>
+  <option className="bg-gray-800 text-white" value="views-desc">Most Viewed</option>
+  <option className="bg-gray-800 text-white" value="title-asc">Title A-Z</option>
+  <option className="bg-gray-800 text-white" value="title-desc">Title Z-A</option>
+</select>
+
             
             <button 
               type="submit"
