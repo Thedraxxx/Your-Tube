@@ -31,13 +31,24 @@ export default function UploadPage() {
   // Rest of your functions remain the same
   const handleVideoChange = (e) => {
     const file = e.target.files[0];
-    if (!file?.type.startsWith('video/')) {
+    if (!file) return;
+  
+    // Check file type
+    if (!file.type.startsWith('video/')) {
       setError('Please select a valid video file');
       return;
     }
+  
+    // Check file size (10MB = 10 * 1024 * 1024 bytes)
+    if (file.size > 10 * 1024 * 1024) {
+      setError('Video file must be smaller than 10MB');
+      return;
+    }
+  
     setVideoFile(file);
     setError('');
   };
+  
 
   // Other functions and JSX remain unchanged
   // ...
