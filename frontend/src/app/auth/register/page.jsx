@@ -1,8 +1,9 @@
 'use client';
 
-import { use, useState } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/app/context/authcontext';
+
 export default function Register() {
   const [form, setForm] = useState({
     username: '',
@@ -16,6 +17,7 @@ export default function Register() {
   const router = useRouter();
   const { setIsAuthenticated } = useAuth(); 
   const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
@@ -28,41 +30,72 @@ export default function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (form.password !== form.confirmPassword) {
-      setError('Passwords do not match');
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append('username', form.username);
-    formData.append('email', form.email);
-    formData.append('fullname', form.fullname);
-    formData.append('password', form.password);
-    formData.append('avatar', form.avatar);
-    if (form.coverImage) formData.append('coverImage', form.coverImage);
+    setIsSubmitting(true);
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v2/users/register`, {
-        method: 'POST',
-        body: formData,
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.message || 'Registration failed');
+      if (form.password !== form.confirmPassword) {
+        setError('Passwords do not match');
+        setIsSubmitting(false);
+        return;
       }
 
-      console.log('User registered:', data);
-      alert("user registerd successfully")
-      setIsAuthenticated(true); 
-      router.push("/");
-    } catch (err) {
-      setError(err.message);
-    }
+      const formData = new FormData();
+      formData.append('username', form.username);
+      formData.append('email', form.email);
+      formData.append('fullname', form.fullname);
+      formData.append('password', form.password);
+      
+      if (form.avatar) {
+        formData.append('avatar', form.avatar);
+      }
+      
+      if (form.coverImage) {
+        formData.append('coverImage', form.coverImage);
+      }
 
-   
+      // First register the user
+      const registerRes = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v2/users/register`, {
+        method: 'POST',
+        body: formData,
+        credentials: 'include', // This ensures cookies are stored after registration
+      });
+
+      const registerData = await registerRes.json();
+
+      if (!registerRes.ok) {
+        throw new Error(registerData.message || 'Registration failed');
+      }
+
+      console.log('User registered successfully:', registerData);
+      
+      // Now login the user with the same credentials to ensure session is created
+      const loginFormData = new FormData();
+      loginFormData.append('email', form.email);
+      loginFormData.append('password', form.password);
+      
+      const loginRes = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v2/users/login`, {
+        method: 'POST',
+        body: loginFormData,
+        credentials: 'include', // This ensures cookies are stored
+      });
+      
+      const loginData = await loginRes.json();
+      
+      if (!loginRes.ok) {
+        throw new Error(loginData.message || 'Registration successful but login failed');
+      }
+
+      // Update authentication state and redirect
+      setIsAuthenticated(true);
+      alert("User registered successfully!");
+      router.push("/");
+      
+    } catch (err) {
+      setError(err.message || 'An error occurred');
+      console.error('Registration error:', err);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -147,10 +180,23 @@ export default function Register() {
 
         <button
           type="submit"
-          className="w-full bg-red-600 hover:bg-red-700 py-2 rounded text-white font-bold"
+          disabled={isSubmitting}
+          className={`w-full bg-red-600 hover:bg-red-700 py-2 rounded text-white font-bold ${
+            isSubmitting ? 'opacity-70 cursor-not-allowed' : ''
+          }`}
         >
-          Create Account
+          {isSubmitting ? 'Creating Account...' : 'Create Account'}
         </button>
+        
+        <p className="text-sm text-center">
+          Already have an account?{' '}
+          <span
+            onClick={() => router.push('/auth/login')}
+            className="text-blue-500 hover:underline cursor-pointer"
+          >
+            Sign In
+          </span>
+        </p>
       </form>
     </div>
   );

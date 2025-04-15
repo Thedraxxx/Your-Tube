@@ -25,7 +25,7 @@ export default function ProfileSummary() {
           }
         );
         const data = await res.json();
-        console.log("Fetched data:", data);
+        // console.log("Fetched data:", data);
 
         if (data?.data) {
           setUser(data.data); // set the user
