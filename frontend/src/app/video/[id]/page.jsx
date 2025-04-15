@@ -5,6 +5,7 @@ import { formatDistanceToNow } from "date-fns";
 import axios from "axios";
 import { useAuth } from "@/app/context/authcontext";
 import CommentSection from "@/app/components/comment";
+import ensureHttps from "@/app/utils/httpSolution";
 
 // fetch video by id
 async function getVideo(id) {
@@ -115,8 +116,8 @@ export default function VideoPage({ params }) {
         <video
           controls
           className="w-full h-full rounded-lg shadow-md"
-          src={video.videoFile}
-          poster={video.thumbnail}
+          src={ensureHttps(video.videoFile)}
+          poster={ensureHttps(video.thumbnail)}
         />
       </div>
 

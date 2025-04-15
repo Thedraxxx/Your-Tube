@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import Link from 'next/link'; // Import Link from Next.js
 import { formatDistanceToNow } from 'date-fns';
+import ensureHttps from '../utils/httpSolution';
 
 export default function VideoCard({ video }) {
   const [imageError, setImageError] = useState(false);
@@ -51,7 +52,7 @@ export default function VideoCard({ video }) {
           <div className="aspect-video relative bg-gray-200">
             {thumbnail && !imageError ? (
               <img
-                src={thumbnail}
+                src={ensureHttps(thumbnail)}
                 alt={title}
                 className="object-cover w-full h-full"
                 onError={() => setImageError(true)}
