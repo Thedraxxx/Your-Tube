@@ -103,18 +103,18 @@ const userRegister = asyncHandler(async (req, res) => {
 */
 const userLogin = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
-
+  
   if (!email) {
     throw new ApiError(401, "email xaina halako");
   }
-
+  
   const existingUser = await User.findOne({ email }).select("+password");
   if (!existingUser) {
     throw new ApiError(401, `this emali ${email} is not registered`);
   }
-
+  
   const isPasswordValid = await existingUser.isPasswordCorrect(password);
-
+  
   if (!isPasswordValid) {
     throw new ApiError(401, "incorrect password");
   }
@@ -122,16 +122,18 @@ const userLogin = asyncHandler(async (req, res) => {
   const { accessToken, refreshToken } = await generateAccessandRefreshToken(
     existingUser._id
   );
-
+  
   const loggedInUser = await User.findOne(existingUser._id).select(
     "-password -refreshToken"
   );
-
+  
   const options = {
     httpOnly: true,
     secure: true,
+    sameSite: "none",  // Added this line for cross-domain cookie transmission
+    maxAge: 24 * 60 * 60 * 1000 // or whatever expiration you prefer
   };
-
+  
   return res
     .status(200)
     .cookie("accessToken", accessToken, options)
