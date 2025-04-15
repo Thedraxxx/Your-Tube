@@ -7,7 +7,7 @@ import Image from "next/image";
 export default function ProfileSummary() {
   const { isAuthenticated } = useAuth();
   const [user, setUser] = useState(null);
-  const [videos, setVideos] = useState([]); // New state for videos
+  const [videos, setVideos] = useState([]);
   const router = useRouter();
 
   useEffect(() => {
@@ -25,10 +25,8 @@ export default function ProfileSummary() {
           }
         );
         const data = await res.json();
-        // console.log("Fetched data:", data);
-
         if (data?.data) {
-          setUser(data.data); // set the user
+          setUser(data.data);
         } else {
           console.error("User data is missing or has an incorrect structure.");
         }
@@ -40,7 +38,6 @@ export default function ProfileSummary() {
     fetchUser();
   }, [isAuthenticated, router]);
 
-  // ✅ Second useEffect to fetch videos after user is set
   useEffect(() => {
     if (!user?._id) return;
 
@@ -53,8 +50,6 @@ export default function ProfileSummary() {
           }
         );
         const data = await res.json();
-        console.log("Fetched videos:", data);
-
         if (data?.data) {
           setVideos(data.data);
         } else {
@@ -67,23 +62,21 @@ export default function ProfileSummary() {
 
     fetchVideos();
   }, [user]);
+
   const handleChange = (id) => {
     router.push(`/video/${id}`);
   };
 
-  if (!user)
-    return <div className="text-white text-center py-4">Loading...</div>;
-
   const handleDelete = async (id) => {
     const confirmDelete = confirm("Are you sure you want to delete this video?");
     if (!confirmDelete) return;
-  
+
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v2/videos/${id}`, {
         method: "DELETE",
         credentials: "include",
       });
-  
+
       if (res.ok) {
         setVideos((prev) => prev.filter((vid) => vid._id !== id));
         alert("Video deleted successfully.");
@@ -97,28 +90,29 @@ export default function ProfileSummary() {
       alert("An error occurred while deleting.");
     }
   };
-  
+
+  if (!user)
+    return <div className="text-white text-center py-6 text-lg animate-pulse">Loading profile...</div>;
 
   return (
-    <div className="bg-gray-900 text-white min-h-screen flex flex-col items-center">
+    <div className="bg-[#0f172a] text-white min-h-screen px-4 sm:px-8 py-8">
       {/* Cover Image */}
-      {user.coverImage ? (
-        <div className="w-full h-64 relative overflow-hidden rounded-lg shadow-md">
+      <div className="relative w-full h-64 rounded-lg overflow-hidden shadow-lg mb-10">
+        {user.coverImage ? (
           <Image
             src={user.coverImage}
             alt="Cover"
             fill
             className="object-cover opacity-80"
           />
-        </div>
-      ) : (
-        <div className="w-full h-64 bg-gray-800 rounded-lg shadow-md" />
-      )}
+        ) : (
+          <div className="w-full h-full bg-gray-800" />
+        )}
+      </div>
 
-      {/* Profile Info */}
-      <div className="w-full p-6 flex flex-col items-center bg-gray-900 rounded-b-lg shadow-lg mt-6">
-        {/* Avatar */}
-        <div className="w-28 h-28 rounded-full overflow-hidden mb-4 border-4 border-gray-700 shadow-lg">
+      {/* Profile Card */}
+      <div className="bg-[#1e293b] rounded-xl p-6 shadow-lg text-center max-w-xl mx-auto mb-10 animate-fadeIn">
+        <div className="w-28 h-28 mx-auto rounded-full overflow-hidden border-4 border-gray-600 shadow-md mb-4">
           {user.avatar ? (
             <Image
               src={user.avatar}
@@ -131,62 +125,46 @@ export default function ProfileSummary() {
             <div className="w-full h-full bg-gray-700" />
           )}
         </div>
-
-        {/* Full Name */}
-        <h1 className="text-3xl font-semibold text-center">
-          {user.fullname || "Unknown User"}
-        </h1>
-
-        {/* Username */}
-        <p className="text-gray-400 text-sm mt-2">
-          @{user.username || "No Username"}
-        </p>
-
-        {/* Email */}
-        <p className="text-gray-500 text-sm mt-2">{user.email || "No Email"}</p>
+        <h1 className="text-2xl font-bold">{user.fullname || "Unknown User"}</h1>
+        <p className="text-gray-400 text-sm mt-1">@{user.username || "No Username"}</p>
+        <p className="text-gray-500 text-sm mt-1">{user.email || "No Email"}</p>
       </div>
 
-      {/* Video Section */}
-      <div className="w-full p-6 mt-8 bg-gray-800 rounded-lg shadow-lg">
-        <h2 className="text-xl font-semibold text-center text-white mb-4">
-          Your Videos
-        </h2>
+      {/* Videos Section */}
+      <div className="max-w-7xl mx-auto">
+        <h2 className="text-2xl font-semibold text-center mb-6">Your Videos</h2>
         {videos.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {videos.map((video) => (
               <div
                 key={video._id}
-                className="bg-gray-700 rounded-lg overflow-hidden shadow-md group relative"
+                className="bg-[#1e293b] rounded-lg overflow-hidden shadow-md group hover:scale-[1.02] transition-transform duration-200"
               >
                 <Image
                   src={video.thumbnail}
                   alt={video.title}
-                  width={300}
+                  width={400}
                   height={200}
-                  className="object-cover w-full h-48 cursor-pointer"
+                  className="w-full h-48 object-cover cursor-pointer"
                   onClick={() => handleChange(video._id)}
                 />
                 <div className="p-4">
-                  <h3 className="text-lg font-semibold text-white">
-                    {video.title}
-                  </h3>
+                  <h3 className="text-lg font-semibold">{video.title}</h3>
                   <p className="text-gray-400 text-sm">{video.views} views</p>
-                  <p className="text-gray-500 text-xs">
-                    {new Date(video.createdAt).toLocaleDateString()}
-                  </p>
+                  <p className="text-gray-500 text-xs">{new Date(video.createdAt).toLocaleDateString()}</p>
                 </div>
 
-                {/* Buttons (Edit/Delete) */}
-                <div className="absolute top-2 right-2 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition">
+                {/* Buttons */}
+                <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   <button
                     onClick={() => router.push(`/video/edit-video/${video._id}`)}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 text-sm rounded"
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm shadow"
                   >
                     Edit
                   </button>
                   <button
                     onClick={() => handleDelete(video._id)}
-                    className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 text-sm rounded"
+                    className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm shadow"
                   >
                     Delete
                   </button>
@@ -195,9 +173,7 @@ export default function ProfileSummary() {
             ))}
           </div>
         ) : (
-          <p className="text-center text-gray-400">
-            You have not posted any videos yet.
-          </p>
+          <p className="text-center text-gray-400 mt-6">You have not posted any videos yet.</p>
         )}
       </div>
     </div>
