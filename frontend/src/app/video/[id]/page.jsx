@@ -3,9 +3,11 @@ import { use } from "react";
 import { useState, useEffect } from "react";
 import { formatDistanceToNow } from "date-fns";
 import axios from "axios";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/context/authcontext";
 import CommentSection from "@/app/components/comment";
 import ensureHttps from "@/app/utils/httpSolution";
+import { useRouter } from "next/router";
 
 // fetch video by id
 async function getVideo(id) {
@@ -73,9 +75,12 @@ export default function VideoPage({ params }) {
       }
     });
   }, [id, isAuthenticated]);
-
+   const router = useRouter();
   const handleSubscribeToggle = async () => {
-    if (!isAuthenticated) return;
+    if (!isAuthenticated) {
+        router.push("/auth/login")
+        return
+    };
 
     try {
       const res = await axios.post(
@@ -93,7 +98,10 @@ export default function VideoPage({ params }) {
   };
 
   const handleLike = async () => {
-    if (!isAuthenticated) return;
+    if (!isAuthenticated) {
+      router.push("/auth/login");
+      return;
+    };
 
     try {
       await axios.post(
