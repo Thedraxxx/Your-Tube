@@ -39,7 +39,4 @@ This is a **YouTube Clone project** built to deepen my understanding of real-wor
 - **Postman** for testing
 - **Render** for hosting
 
----
-
-## 📂 Project Structure (Backend)
 
