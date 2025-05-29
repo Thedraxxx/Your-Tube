@@ -1,42 +1,49 @@
-# 🎥 YouTube Clone (Backend-Focused Full Stack Project)
+🎥 YouTube Clone (Backend-Focused Full Stack Project)
+This is a YouTube Clone project built to deepen my understanding of real-world backend development using Node.js, Express.js, and MongoDB.
+The goal was to go beyond tutorials and learn how to structure, build, and deploy a production-level backend with full API functionality and cloud storage integration.
 
-This is a **YouTube Clone project** built to deepen my understanding of real-world **backend development** using **Node.js**, **Express.js**, and **MongoDB**. The goal was to go beyond tutorials and learn how to structure, build, and deploy a production-level backend with full API functionality and cloud storage integration.
+🚀 Live Demo
+🔗 https://your-tube-pearl.vercel.app/
 
----
+🧠 What I Learned
+🔧 Node.js & Express.js – building scalable and maintainable REST APIs
 
-## 🚀 Live Demo
+🧩 MVC structure – clean separation using routes, controllers, services, and config
 
-** https://your-tube-pearl.vercel.app/
+☁️ Cloudinary – for video/image upload and storage
 
----
+🌱 MongoDB – CRUD operations with advanced aggregation pipelines
 
-## 🧠 What I Learned
+📫 API Communication – connecting frontend and backend using real data
 
-- 🔧 **Node.js & Express.js** – building scalable REST APIs
-- 🧩 **MVC structure** – routes, controllers, services, config
-- ☁️ **Cloudinary integration** – for handling video/image uploads
-- 🌱 **MongoDB** – with advanced CRUD and aggregation pipelines
-- 📫 **Connecting frontend & backend** – real API communication
-- 🧪 **Postman** – for API testing and debugging
-- 📁 **Production-level file structure**
-- 🧠 Error handling, environment variables, and async patterns
+🧪 Postman – for API testing, debugging, and iteration
 
----
+📁 Production-level file structure and organization
 
-## 🛠 Tech Stack
+⚙️ Environment variable management, error handling, and async patterns
 
-### Frontend:
-- **React.js**
-- **Tailwind CSS**
-- **Axios** for API calls
-- **Vercel** for deployment
+🛠 Tech Stack
+🔹 Frontend
+React.js
 
-### Backend:
-- **Node.js**
-- **Express.js**
-- **MongoDB & Mongoose**
-- **Cloudinary** for media storage
-- **Postman** for testing
-- **Render** for hosting
+Tailwind CSS
 
+Axios for API communication
+
+Vercel for deployment
+
+🔸 Backend
+Node.js
+
+Express.js
+
+MongoDB with Mongoose
+
+Cloudinary (for handling media uploads)
+
+Postman (API testing tool)
+
+Render for backend deployment
+
+⚠️ Note: Render has some limitations – backend startup can be slow on free tier, and video uploads are limited to 10MB.
 
