@@ -40,7 +40,11 @@ const userSchema = new mongoose.Schema(
       required: [true, "Password is required"],
       select: false, // Hides password in queries
     },
-
+     role: {
+      type: String,
+      enum: ["user", "admin"], // Only 'user' or 'admin' roles allowed
+      default: "user", // Default role is 'user'
+     },
     /* 🖼️ Avatar Image (stored in cloud services) */
     avatar: {
       type: String, // Cloudinary / AWS URL
@@ -99,6 +103,7 @@ userSchema.methods.generateAccessToken = function () {
       email: this.email,
       username: this.username,
       fullname: this.fullname,
+      role: this.role,
     },
     process.env.ACCESS_TOKEN_SECRET,
     { expiresIn: process.env.ACCESS_TOKEN_EXPIRY } // ⏳ Expiry time from environment variables
@@ -110,7 +115,9 @@ userSchema.methods.generateAccessToken = function () {
    ------------------------------------------ */
 userSchema.methods.generateRefreshToken = function () {
   return jwt.sign(
-    { _id: this._id },
+    { _id: this._id,
+      role: this.role,
+     },
     process.env.REFRESH_TOKEN_SECRET,
     { expiresIn: process.env.REFRESH_TOKEN_EXPIRY }
   );

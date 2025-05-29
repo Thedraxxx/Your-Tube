@@ -160,6 +160,7 @@ const uploadVideo = asyncHandler(async (req, res) => {
 const deleteVideo = asyncHandler(async (req, res) => {
   const videoid = req.params?.id.trim();
   const userId = req.user?._id;
+  const userRole = req.user?.role;
   // console.log(videoid);
   const video = await Video.findById(videoid);
   if (!video) {
@@ -168,7 +169,7 @@ const deleteVideo = asyncHandler(async (req, res) => {
   // console.log('user videos:',video);
   // console.log('user:',video.owner);
   // console.log('userid :', userId);
-  if (!video.owner.equals(userId)) {
+  if (userRole !== "admin" && !video.owner.equals(userId)) {
     throw new ApiError(403, "you are not authorized to delete this video.");
   }
   //   console.log(video.videoFile)
