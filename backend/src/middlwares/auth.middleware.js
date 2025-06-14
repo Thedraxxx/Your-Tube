@@ -8,7 +8,7 @@ const jwtvarify = asyncHandler(async (req, _, next) => {
     // Extract token from cookies or Authorization header
     const token =
       req.cookies?.accessToken ||
-      req.header("Authorization")?.replace("Bearer ", "");
+      req.header("Authorization")?.replace("Bearer ", "");   //Authorization: Bearer abc123token
     // console.log(token);
     // console.log("cookies : ",req.cookies)
     // console.log("auth header : ",req.header("Authorization"));
